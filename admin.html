@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚙️ إدارة المستخدمين</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -15,158 +20,710 @@
             justify-content: center;
             padding: 20px;
         }
-        .admin-box {
+
+        .login-container {
             background: white;
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            max-width: 950px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            width: 600px;
+            max-width: 95%;
+        }
+
+        .login-container h1 {
+            color: #1e3c72;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .login-container .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .login-container .form-group {
+            margin-bottom: 15px;
+        }
+
+        .login-container .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .login-container .form-group input,
+        .login-container .form-group select {
             width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
         }
-        .admin-box h1 { color: #1e3c72; text-align: center; margin-bottom: 10px; }
-        .admin-box .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; color: #333; }
-        .form-group input, .form-group select {
-            width: 100%; padding: 10px;
-            border: 2px solid #e0e0e0; border-radius: 8px;
-            font-size: 14px; transition: all 0.3s;
+
+        .login-container .form-group input:focus,
+        .login-container .form-group select:focus {
+            outline: none;
+            border-color: #8b5cf6;
         }
-        .form-group input:focus, .form-group select:focus {
-            outline: none; border-color: #8b5cf6;
+
+        .login-container .form-group select {
+            background: white;
+            cursor: pointer;
         }
-        .btn-create {
-            width: 100%; padding: 12px; border: none; border-radius: 8px;
+
+        /* Champ mot de passe avec boutons */
+        .password-field {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .password-field input {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
             background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-            color: white; font-size: 16px; font-weight: 600;
-            cursor: pointer; transition: all 0.3s;
-        }
-        .btn-create:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4); }
-        .btn-delete {
-            padding: 5px 12px; border: none; border-radius: 6px;
-            background: #ef4444; color: white; font-weight: 600;
-            cursor: pointer; transition: all 0.3s; font-size: 12px;
-        }
-        .btn-delete:hover { background: #dc2626; }
-        .users-list { max-height: 400px; overflow-y: auto; }
-        .user-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px; background: #f9fafb;
-            border: 1px solid #e5e7eb; border-radius: 8px;
-            margin-bottom: 8px;
-        }
-        .user-item .user-info { display: flex; flex-direction: column; gap: 2px; }
-        .user-item .user-info .uname { font-weight: 600; color: #1e3c72; }
-        .user-item .user-info .udetails { font-size: 13px; color: #6b7280; }
-        .badge-admin {
-            padding: 2px 10px; border-radius: 12px; font-size: 11px;
-            font-weight: 600; background: #fef3c7; color: #92400e; margin-left: 8px;
-        }
-        .badge-viewer {
-            padding: 2px 10px; border-radius: 12px; font-size: 11px;
-            font-weight: 600; background: #dbeafe; color: #1e40af; margin-left: 8px;
-        }
-        .msg {
-            padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none;
-        }
-        .msg.success { background: #d1fae5; color: #065f46; display: block; }
-        .msg.error { background: #fee2e2; color: #dc2626; display: block; }
-        .msg.info { background: #dbeafe; color: #1e40af; display: block; }
-        .admin-actions {
-            margin-top: 20px; padding-top: 20px; border-top: 2px solid #eee;
-            display: flex; gap: 15px; flex-wrap: wrap;
-        }
-        .admin-actions .btn {
-            padding: 10px 20px; border: none; border-radius: 8px;
-            font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 14px;
-        }
-        .admin-actions .btn-primary {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
         }
-        .admin-actions .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4); }
-        .admin-actions .btn-danger { background: #dc2626; color: white; }
-        .admin-actions .btn-danger:hover { background: #b91c1c; }
-        .admin-actions .btn-secondary { background: #6b7280; color: white; }
-        .admin-actions .btn-secondary:hover { background: #4b5563; }
-        .footer-note {
-            margin-top: 20px; padding: 15px; background: #f3f4f6;
-            border-radius: 8px; font-size: 13px; color: #6b7280; text-align: center;
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
         }
-        .footer-note strong { color: #1e3c72; }
-        @media (max-width: 768px) {
-            .admin-grid { grid-template-columns: 1fr; }
-            .admin-box { padding: 20px; }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 13px;
+        }
+
+        .btn-generate {
+            background: #f59e0b;
+            color: white;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .btn-generate:hover {
+            background: #d97706;
+            transform: scale(1.02);
+        }
+
+        .btn-copy {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .btn-copy:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+
+        .btn-copy.copied {
+            background: #10b981;
+        }
+
+        .btn-email {
+            background: #8b5cf6;
+            color: white;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .btn-email:hover {
+            background: #7c3aed;
+            transform: scale(1.02);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        /* Messages */
+        .error-msg {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .info-msg {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .info-msg.success {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+
+        .info-msg.error {
+            background: #fee2e2;
+            color: #dc2626;
+            display: block;
+        }
+
+        .info-msg.loading {
+            background: #dbeafe;
+            color: #1e40af;
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .footer-note {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+        }
+
+        /* Liste des utilisateurs */
+        .users-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .user-item .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .user-item .user-info .uemail {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .user-item .user-info .udetails {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .badge-admin {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #fef3c7;
+            color: #92400e;
+            margin-left: 8px;
+        }
+
+        .badge-viewer {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #dbeafe;
+            color: #1e40af;
+            margin-left: 8px;
+        }
+
+        .password-strength {
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        .password-strength.weak {
+            color: #dc2626;
+        }
+        .password-strength.medium {
+            color: #f59e0b;
+        }
+        .password-strength.strong {
+            color: #10b981;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 2px solid #eee;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .admin-actions .btn {
+            flex: 1;
+            min-width: 100px;
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .back-link a {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .section-title {
+            color: #1e3c72;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 8px;
+        }
+
+        .inline-flex {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .mt-10 {
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 20px;
+            }
+            .password-field {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .password-field input {
+                width: 100%;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-group .btn {
+                flex: none;
+                width: 100%;
+            }
+            .admin-actions .btn {
+                min-width: 80px;
+                font-size: 12px;
+                padding: 8px;
+            }
+            .user-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="admin-box">
+
+    <!-- ========================================== -->
+    <!-- ÉCRAN DE CONNEXION ADMIN -->
+    <!-- ========================================== -->
+    <div id="loginScreen" class="login-container">
         <h1>⚙️ إدارة المستخدمين</h1>
-        <p class="subtitle">إنشاء وإدارة حسابات المستخدمين لتطبيق إدارة المراسلات</p>
+        <p class="subtitle">Accès réservé aux administrateurs</p>
 
-        <div id="msg" class="msg"></div>
+        <div id="loginError" class="error-msg"></div>
 
-        <div class="admin-grid">
-            <div>
-                <h3 style="color:#1e3c72; margin-bottom:15px; font-size:16px;">➕ إنشاء مستخدم جديد</h3>
-                <div class="form-group">
-                    <label>👤 اسم المستخدم *</label>
-                    <input type="text" id="username" placeholder="اسم المستخدم">
-                </div>
-                <div class="form-group">
-                    <label>🔑 كلمة المرور *</label>
-                    <input type="text" id="password" placeholder="4 أحرف على الأقل">
-                </div>
-                <div class="form-group">
-                    <label>🏢 المكتب / الخدمة *</label>
-                    <input type="text" id="service" placeholder="مثال: المكتب الفلاني, قسم الموارد البشرية">
-                </div>
-                <div class="form-group">
-                    <label>🏛️ المؤسسة / الشركة *</label>
-                    <input type="text" id="societe" placeholder="مثال: شركة X, وزارة Y">
-                </div>
-                <div class="form-group">
-                    <label>🔐 الصلاحية (Rôle) *</label>
-                    <select id="role">
-                        <option value="admin">⭐ مسؤول (Ajout/Modification/Suppression)</option>
-                        <option value="viewer">👁️ مشاهد (Consultation seule)</option>
-                    </select>
-                </div>
-                <button class="btn-create" onclick="createUser()">📝 إنشاء المستخدم</button>
-            </div>
-
-            <div>
-                <h3 style="color:#1e3c72; margin-bottom:15px; font-size:16px;">📋 قائمة المستخدمين</h3>
-                <div id="usersList" class="users-list"></div>
-            </div>
+        <div class="form-group">
+            <label>🔑 Mot de passe administrateur</label>
+            <input type="password" id="adminPassword" placeholder="Entrez le mot de passe">
         </div>
-
-        <div class="admin-actions">
-            <button class="btn btn-secondary" onclick="refreshUsersList()">🔄 تحديث القائمة</button>
-            <button class="btn btn-danger" onclick="resetAllUsers()">🗑 حذف جميع المستخدمين</button>
-            <button class="btn btn-primary" onclick="location.reload()">📌 Recharger</button>
-        </div>
-
+        <button class="btn btn-primary btn-block" onclick="loginAdmin()">🚪 Accéder</button>
         <div class="footer-note">
-            💡 <strong>Compte admin par défaut :</strong> admin / admin123<br>
-            <span style="font-size:12px;">👁️ <strong>Viewer :</strong> consultation seule sans modification</span>
+            🔒 Contactez l'administrateur si vous n'avez pas le mot de passe
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PANEL ADMIN -->
+    <!-- ========================================== -->
+    <div id="adminPanel" class="login-container hidden">
+        <h1>⚙️ إدارة المستخدمين</h1>
+        <p class="subtitle">Création et gestion des comptes</p>
+
+        <div id="adminMsg" class="info-msg"></div>
+
+        <!-- Formulaire de création -->
+        <div style="text-align:left; margin-bottom:20px;">
+            <h3 class="section-title">➕ إنشاء مستخدم جديد</h3>
+
+            <div class="form-group">
+                <label>📧 البريد الإلكتروني *</label>
+                <input type="email" id="adminEmail" placeholder="email@domaine.com">
+            </div>
+
+            <div class="form-group">
+                <label>🔑 كلمة المرور *</label>
+                <div class="password-field">
+                    <input type="text" id="adminPasswordUser" placeholder="6 caractères minimum">
+                    <button class="btn-generate" onclick="generatePassword()" title="Générer un mot de passe sécurisé">
+                        🔄 Générer
+                    </button>
+                    <button class="btn-copy" onclick="copyPassword()" title="Copier le mot de passe" id="copyBtn">
+                        📋 Copier
+                    </button>
+                    <button class="btn-email" onclick="sendPasswordEmail()" title="Envoyer par email">
+                        📧 Email
+                    </button>
+                </div>
+                <div id="passwordStrength" class="password-strength"></div>
+                <div style="font-size:11px; color:#6b7280; margin-top:3px;">
+                    💡 12 caractères (majuscules, minuscules, chiffres, symboles)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>🔐 Privilèges *</label>
+                <select id="adminRole">
+                    <option value="viewer">👁️ مشاهد (Consultation seule)</option>
+                    <option value="admin">⭐ مسؤول (Ajout/Modification/Suppression)</option>
+                </select>
+                <div style="font-size:11px; color:#6b7280; margin-top:3px;">
+                    🔹 <strong>مشاهد</strong> : Peut consulter les courriers uniquement<br>
+                    🔹 <strong>مسؤول</strong> : Peut ajouter, modifier et supprimer des courriers
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>🏢 المكتب / الخدمة</label>
+                <input type="text" id="adminService" placeholder="Ex: Bureau des affaires générales">
+            </div>
+
+            <div class="form-group">
+                <label>🏛️ المؤسسة / الشركة</label>
+                <input type="text" id="adminSociete" placeholder="Ex: Ministère de l'Intérieur">
+            </div>
+
+            <button class="btn btn-primary btn-block" onclick="createUser()" id="createBtn">
+                📝 إنشاء المستخدم
+            </button>
+        </div>
+
+        <hr>
+
+        <!-- Liste des utilisateurs -->
+        <h3 class="section-title">📋 قائمة المستخدمين</h3>
+        <div id="usersList" class="users-list"></div>
+
+        <!-- Actions -->
+        <div class="admin-actions">
+            <button class="btn btn-secondary" onclick="refreshUsersList()">🔄 تحديث</button>
+            <button class="btn btn-danger" onclick="resetAllUsers()">🗑 حذف الكل</button>
+        </div>
+
+        <button class="btn btn-secondary btn-block mt-10" onclick="logoutAdmin()">🚪 تسجيل الخروج</button>
+
+        <div class="back-link">
+            <a href="courriers.html">⬅️ Retour à l'application</a>
         </div>
     </div>
 
     <script>
+        // ============================================================
+        //  🔐 MOT DE PASSE ADMINISTRATEUR (À CHANGER !)
+        // ============================================================
+        const ADMIN_PASSWORD = "Admin2024Secure!";
+
+        // ============================================================
+        //  🔑 GÉNÉRATEUR DE MOT DE PASSE
+        // ============================================================
+        function generatePassword(length = 12) {
+            const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+            const numbers = '0123456789';
+            const symbols = '!@#$%^&*()_+-=';
+            const all = uppercase + lowercase + numbers + symbols;
+
+            let password = '';
+            // Forcer au moins un de chaque type
+            password += uppercase.charAt(Math.floor(Math.random() * uppercase.length));
+            password += lowercase.charAt(Math.floor(Math.random() * lowercase.length));
+            password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            password += symbols.charAt(Math.floor(Math.random() * symbols.length));
+
+            // Remplir le reste
+            for (let i = 4; i < length; i++) {
+                password += all.charAt(Math.floor(Math.random() * all.length));
+            }
+
+            // Mélanger
+            password = password.split('').sort(() => Math.random() - 0.5).join('');
+
+            document.getElementById('adminPasswordUser').value = password;
+            updatePasswordStrength(password);
+
+            // Réinitialiser le bouton copier
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.textContent = '📋 Copier';
+            copyBtn.className = 'btn-copy';
+
+            return password;
+        }
+
+        function updatePasswordStrength(password) {
+            const el = document.getElementById('passwordStrength');
+            if (!password || password.length < 6) {
+                el.textContent = '';
+                el.className = 'password-strength';
+                return;
+            }
+
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.length >= 12) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            if (strength <= 2) {
+                el.textContent = '🔴 Faible';
+                el.className = 'password-strength weak';
+            } else if (strength <= 4) {
+                el.textContent = '🟡 Moyen';
+                el.className = 'password-strength medium';
+            } else {
+                el.textContent = '🟢 Fort';
+                el.className = 'password-strength strong';
+            }
+        }
+
+        function copyPassword() {
+            const input = document.getElementById('adminPasswordUser');
+            const btn = document.getElementById('copyBtn');
+
+            if (!input.value) {
+                alert('Aucun mot de passe à copier. Générez-en un d\'abord.');
+                return;
+            }
+
+            navigator.clipboard.writeText(input.value).then(() => {
+                btn.textContent = '✅ Copié !';
+                btn.className = 'btn-copy copied';
+                setTimeout(() => {
+                    btn.textContent = '📋 Copier';
+                    btn.className = 'btn-copy';
+                }, 2500);
+            }).catch(() => {
+                input.select();
+                document.execCommand('copy');
+                btn.textContent = '✅ Copié !';
+                btn.className = 'btn-copy copied';
+                setTimeout(() => {
+                    btn.textContent = '📋 Copier';
+                    btn.className = 'btn-copy';
+                }, 2500);
+            });
+        }
+
+        // ============================================================
+        //  📧 ENVOI PAR EMAIL
+        // ============================================================
+        function sendPasswordEmail() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPasswordUser').value.trim();
+
+            if (!email) {
+                alert('Veuillez d\'abord entrer l\'adresse email du destinataire');
+                return;
+            }
+
+            if (!password) {
+                alert('Veuillez générer un mot de passe d\'abord');
+                return;
+            }
+
+            const role = document.getElementById('adminRole').value;
+            const roleLabel = role === 'admin' ? '⭐ Administrateur' : '👁️ Utilisateur (consultation)';
+
+            const subject = encodeURIComponent("🔑 Vos identifiants de connexion - إدارة المراسلات");
+            const body = encodeURIComponent(`
+        📧 Email : ${email}
+        🔑 Mot de passe : ${password}
+        🔐 Rôle : ${roleLabel}
+
+        🌐 Lien d'accès : ${window.location.origin}/courriers.html
+
+        ⚠️ Important :
+        - Changez votre mot de passe lors de votre première connexion
+        - Ne partagez pas vos identifiants
+
+        ---------------------------
+        📧 البريد الإلكتروني : ${email}
+        🔑 كلمة المرور : ${password}
+        🔐 الصلاحية : ${roleLabel}
+
+        🌐 رابط الدخول : ${window.location.origin}/courriers.html
+
+        ⚠️ تنبيه :
+        - يُرجى تغيير كلمة المرور عند أول تسجيل دخول
+        - لا تشارك بيانات الدخول مع الآخرين
+        `);
+
+            window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+        }
+
+        // ============================================================
+        //  🔐 AUTHENTIFICATION ADMIN
+        // ============================================================
+        function loginAdmin() {
+            const password = document.getElementById('adminPassword').value;
+            const errorEl = document.getElementById('loginError');
+
+            if (!password) {
+                errorEl.textContent = '❌ Veuillez entrer le mot de passe';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            if (password !== ADMIN_PASSWORD) {
+                errorEl.textContent = '❌ Mot de passe incorrect';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            errorEl.style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').classList.remove('hidden');
+            refreshUsersList();
+
+            // Générer un mot de passe par défaut
+            setTimeout(() => {
+                if (!document.getElementById('adminPanel').classList.contains('hidden')) {
+                    generatePassword(12);
+                }
+            }, 200);
+        }
+
+        function logoutAdmin() {
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        // ============================================================
+        //  👤 GESTION DES UTILISATEURS
+        // ============================================================
         function getUsers() {
             const data = localStorage.getItem('app_users');
-            if (data) {
-                return JSON.parse(data);
-            }
+            if (data) return JSON.parse(data);
             const defaultUsers = {
-                'admin': {
+                'admin@systeme.com': {
                     password: 'admin123',
                     service: 'Administration',
                     societe: 'Système',
-                    isAdmin: true,
                     role: 'admin'
                 }
             };
@@ -179,86 +736,89 @@
         }
 
         function createUser() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const service = document.getElementById('service').value.trim();
-            const societe = document.getElementById('societe').value.trim();
-            const role = document.getElementById('role').value;
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPasswordUser').value.trim();
+            const role = document.getElementById('adminRole').value;
+            const service = document.getElementById('adminService').value.trim();
+            const societe = document.getElementById('adminSociete').value.trim();
 
-            if (!username || !password || !service || !societe) {
-                showMsg('الرجاء ملء جميع الحقول', 'error');
+            if (!email || !password) {
+                showAdminMsg('الرجاء ملء البريد الإلكتروني وكلمة المرور', 'error');
                 return;
             }
 
-            if (password.length < 4) {
-                showMsg('كلمة المرور يجب أن تكون 4 أحرف على الأقل', 'error');
+            if (password.length < 6) {
+                showAdminMsg('كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'error');
                 return;
             }
 
             const users = getUsers();
-            if (users[username]) {
-                showMsg('اسم المستخدم موجود بالفعل', 'error');
+            if (users[email]) {
+                showAdminMsg('البريد الإلكتروني موجود بالفعل', 'error');
                 return;
             }
 
-            users[username] = {
+            users[email] = {
                 password: password,
-                service: service,
-                societe: societe,
-                isAdmin: role === 'admin',
+                service: service || '',
+                societe: societe || '',
                 role: role
             };
             saveUsers(users);
 
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('service').value = '';
-            document.getElementById('societe').value = '';
+            document.getElementById('adminEmail').value = '';
+            document.getElementById('adminPasswordUser').value = '';
+            document.getElementById('adminService').value = '';
+            document.getElementById('adminSociete').value = '';
+            document.getElementById('passwordStrength').textContent = '';
+            document.getElementById('passwordStrength').className = 'password-strength';
 
-            showMsg(`✅ تم إنشاء المستخدم "${username}" بنجاح! (${role === 'admin' ? '⭐ مسؤول' : '👁️ مشاهد'})`, 'success');
+            const roleLabel = role === 'admin' ? '⭐ مسؤول' : '👁️ مشاهد';
+            showAdminMsg(`✅ مستخدم "${email}" تم إنشاؤه بنجاح! (${roleLabel})`, 'success');
+
+            // Générer un nouveau mot de passe pour le prochain utilisateur
+            setTimeout(() => generatePassword(12), 300);
             refreshUsersList();
         }
 
-        function deleteUser(username) {
-            if (username === 'admin') {
-                showMsg('لا يمكن حذف حساب المسؤول الرئيسي', 'error');
+        function deleteUser(email) {
+            if (email === 'admin@systeme.com') {
+                showAdminMsg('لا يمكن حذف حساب المسؤول الرئيسي', 'error');
                 return;
             }
-
-            if (confirm(`هل أنت متأكد من حذف المستخدم "${username}" نهائياً؟`)) {
+            if (confirm(`هل أنت متأكد من حذف المستخدم "${email}" نهائياً؟`)) {
                 const users = getUsers();
-                delete users[username];
+                delete users[email];
                 saveUsers(users);
                 refreshUsersList();
-                showMsg(`✅ تم حذف المستخدم "${username}"`, 'success');
+                showAdminMsg(`✅ تم حذف المستخدم "${email}"`, 'success');
             }
         }
 
         function refreshUsersList() {
             const users = getUsers();
             const container = document.getElementById('usersList');
-            
-            const usernames = Object.keys(users).sort();
-            if (usernames.length === 0) {
+
+            const emails = Object.keys(users).sort();
+            if (emails.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">لا يوجد مستخدمين</div>';
                 return;
             }
 
-            container.innerHTML = usernames.map(uname => {
-                const data = users[uname];
-                const isAdmin = data.isAdmin || data.role === 'admin';
-                const roleText = isAdmin ? '⭐ مسؤول' : '👁️ مشاهد';
-                const roleBadge = isAdmin ? 
-                    '<span class="badge-admin">⭐ مسؤول</span>' : 
+            container.innerHTML = emails.map(email => {
+                const data = users[email];
+                const isAdmin = data.role === 'admin';
+                const roleBadge = isAdmin ?
+                    '<span class="badge-admin">⭐ مسؤول</span>' :
                     '<span class="badge-viewer">👁️ مشاهد</span>';
-                const delBtn = !isAdmin ? 
-                    `<button class="btn-delete" onclick="deleteUser('${uname}')">🗑 حذف</button>` :
+                const delBtn = !isAdmin ?
+                    `<button class="btn btn-sm btn-danger" onclick="deleteUser('${email}')">🗑 حذف</button>` :
                     '<span style="font-size:12px; color:#999;">🔒</span>';
-                
+
                 return `
                     <div class="user-item">
                         <div class="user-info">
-                            <span class="uname">👤 ${escapeHtml(uname)} ${roleBadge}</span>
+                            <span class="uemail">📧 ${escapeHtml(email)} ${roleBadge}</span>
                             <span class="udetails">🏢 ${escapeHtml(data.service || '-')} | 🏛️ ${escapeHtml(data.societe || '-')}</span>
                         </div>
                         ${delBtn}
@@ -272,46 +832,61 @@
                 if (confirm('DERNIER AVERTISSEMENT : Tous les comptes seront perdus. Confirmer ?')) {
                     const users = getUsers();
                     const newUsers = {
-                        'admin': users['admin'] || {
+                        'admin@systeme.com': users['admin@systeme.com'] || {
                             password: 'admin123',
                             service: 'Administration',
                             societe: 'Système',
-                            isAdmin: true,
                             role: 'admin'
                         }
                     };
                     saveUsers(newUsers);
                     refreshUsersList();
-                    showMsg('✅ Tous les utilisateurs (sauf admin) ont été supprimés', 'info');
+                    showAdminMsg('✅ Tous les utilisateurs (sauf admin) ont été supprimés', 'success');
                 }
             }
         }
 
-        function showMsg(msg, type) {
-            const el = document.getElementById('msg');
+        function showAdminMsg(msg, type) {
+            const el = document.getElementById('adminMsg');
             el.textContent = msg;
-            el.className = 'msg ' + type;
+            el.className = 'info-msg ' + type;
             el.style.display = 'block';
-            setTimeout(() => { el.style.display = 'none'; }, 4000);
+            setTimeout(() => { el.style.display = 'none'; }, 5000);
         }
 
         function escapeHtml(str) {
             if (!str) return '';
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
+        // ============================================================
+        //  ⌨️ GESTION DES TOUCHES
+        // ============================================================
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
-                const active = document.activeElement;
-                if (active && (active.id === 'username' || active.id === 'password' || 
-                               active.id === 'service' || active.id === 'societe' || active.id === 'role')) {
-                    createUser();
+                if (document.getElementById('loginScreen').style.display !== 'none') {
+                    loginAdmin();
                 }
             }
         });
 
-        refreshUsersList();
-        showMsg('💡 Compte admin par défaut: admin / admin123 | 👁️ Viewer: consultation seule', 'info');
+        // ============================================================
+        //  🚀 INITIALISATION
+        // ============================================================
+        document.getElementById('adminPasswordUser').addEventListener('input', function() {
+            updatePasswordStrength(this.value);
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.textContent = '📋 Copier';
+            copyBtn.className = 'btn-copy';
+        });
+
+        document.getElementById('loginScreen').style.display = 'block';
+        document.getElementById('adminPanel').classList.add('hidden');
     </script>
 </body>
 </html>
