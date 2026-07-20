@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html dir="auto" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📮 إدارة المراسلات - وارد / صادر</title>
+    <style>
+        /* ====== STYLES COMPLETS ====== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Noto Sans', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1450px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #1e3c72;
+            font-size: 28px;
+        }
+
+        .header p {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .header .status {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .header .status .online {
+            color: #10b981;
+        }
+
+        .header .status .offline {
+            color: #ef4444;
+        }
+
+        .header .admin-link {
+            margin-top: 10px;
+        }
+
+        .header .admin-link a {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .header .admin-link a:hover {
+            text-decoration: underline;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .search-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-filters input,
+        .search-filters select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .search-filters input:focus,
+        .search-filters select:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .courriers-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .courrier-item {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .courrier-item:hover {
+            background: #f3f4f6;
+            transform: translateX(5px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .courrier-item.selected {
+            background: #e0e7ff;
+            border: 2px solid #1e3c72;
+        }
+
+        .courrier-item .numero {
+            font-weight: bold;
+            color: #1e3c72;
+            font-size: 16px;
+        }
+
+        .courrier-item .expediteur {
+            font-weight: 600;
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .courrier-item .objet {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .courrier-item .date {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .courrier-item .pdf-attachment {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fef3c7;
+            border-radius: 8px;
+        }
+
+        .courrier-item .pdf-attachment a {
+            color: #d97706;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .courrier-item .pdf-attachment a:hover {
+            text-decoration: underline;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .badge-arabe {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-francais {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .badge-pdf {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .type-arrive {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .type-depart {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .apercu-pdf {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state .emoji {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #1e3c72;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .details-content {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .details-content p {
+            margin-bottom: 8px;
+        }
+
+        .details-content strong {
+            color: #1e3c72;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: transparent;
+            color: #64748b;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #1e3c72;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn.arrive {
+            border-right: 3px solid #10b981;
+        }
+
+        .tab-btn.depart {
+            border-right: 3px solid #3b82f6;
+        }
+
+        .sort-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sort-section label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .sort-section select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .search-filters {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📮 إدارة المراسلات - وارد / صادر</h1>
+            <p>تتبع مراسلاتك الواردة والصادرة (بالعربية أو الفرنسية)</p>
+            <div class="status">
+                <span id="serverStatus">🔄 Connexion au serveur...</span>
+            </div>
+            <div class="admin-link">
+                <a href="admin.html">⚙️ Accès administrateur</a>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Recherche -->
+            <div class="card">
+                <h2>🔍 بحث</h2>
+
+                <div class="tabs">
+                    <button class="tab-btn arrive active" onclick="switchTab('arrive')">📥 الوارد</button>
+                    <button class="tab-btn depart" onclick="switchTab('depart')">📤 الصادر</button>
+                    <button class="tab-btn" onclick="switchTab('all')" style="flex:0.5;">📋 الكل</button>
+                </div>
+
+                <div class="search-filters">
+                    <input type="text" id="searchNumero" placeholder="رقم المراسلة">
+                    <input type="date" id="searchDate" placeholder="التاريخ">
+                    <input type="text" id="searchExpediteur" placeholder="المرسل/المستلم">
+                    <input type="text" id="searchObjet" placeholder="كلمة مفتاحية">
+                </div>
+
+                <div class="sort-section">
+                    <label>📊 ترتيب حسب:</label>
+                    <select id="sortBy" onchange="applySortAndDisplay()">
+                        <option value="date_desc">📅 التاريخ (الأحدث أولاً)</option>
+                        <option value="date_asc">📅 التاريخ (الأقدم أولاً)</option>
+                        <option value="numero">🔢 الرقم</option>
+                        <option value="expediteur">👤 المرسل (أ-ي)</option>
+                        <option value="objet">📌 الموضوع (أ-ي)</option>
+                    </select>
+                </div>
+
+                <button onclick="searchCourriers()" class="btn btn-primary" style="width:100%;">🔎 بحث</button>
+                <button onclick="resetSearch()" class="btn btn-secondary" style="width:100%; margin-top:10px;">🔄 إعادة تعيين</button>
+
+                <h2 style="margin-top:20px;">📋 قائمة المراسلات</h2>
+                <div id="resultsCount" style="margin-bottom:10px; color:#666;"></div>
+                <div id="courriersList" class="courriers-list"></div>
+
+                <div id="apercuZone" class="apercu-pdf" style="display:none;">
+                    <h3>📄 معاينة المستند</h3>
+                    <div id="pdfListPreview" style="margin-bottom:10px;"></div>
+                    <iframe id="pdfViewer" class="pdf-viewer" src=""></iframe>
+                </div>
+            </div>
+
+            <!-- Détails -->
+            <div class="card">
+                <h2>📋 Détails du courrier</h2>
+                <div id="detailsContent">
+                    <div class="empty-state">
+                        <span class="emoji">📄</span>
+                        Sélectionnez un courrier pour voir les détails
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  🌐 CONFIGURATION DU SERVEUR
+        //  ⚠️ IMPORTANT : Mettez la bonne IP
+        // ============================================================
+        // Si le serveur est sur le même PC : http://localhost:5000
+        // Si le serveur est sur un autre PC du réseau : http://192.168.1.100:5000
+        const SERVER_URL = "http://localhost:5000";
+
+        // ============================================================
+        //  📡 VÉRIFICATION DU SERVEUR
+        // ============================================================
+        function checkServer() {
+            const statusEl = document.getElementById('serverStatus');
+
+            fetch(`${SERVER_URL}/api/health`)
+                .then(response => {
+                    if (response.ok) {
+                        statusEl.innerHTML = '🟢 Serveur connecté - PDF disponibles';
+                        statusEl.className = 'online';
+                    } else {
+                        statusEl.innerHTML = '🟡 Serveur inaccessible';
+                        statusEl.className = 'offline';
+                    }
+                })
+                .catch(() => {
+                    statusEl.innerHTML = '🔴 Serveur non accessible - Vérifiez que server.py est lancé';
+                    statusEl.className = 'offline';
+                });
+        }
+
+        // ============================================================
+        //  📄 AFFICHAGE DES PDF (via le serveur)
+        // ============================================================
+        function viewPdf(pdfPath) {
+            const viewer = document.getElementById('pdfViewer');
+            const previewDiv = document.getElementById('apercuZone');
+            const listPreview = document.getElementById('pdfListPreview');
+
+            // Afficher le chargement
+            listPreview.innerHTML = '<div class="loading-spinner"></div> 🔄 Chargement du PDF...';
+            previewDiv.style.display = 'block';
+            viewer.src = '';
+
+            // Demander le PDF au serveur
+            fetch(`${SERVER_URL}/api/request-pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ pdf_path: pdfPath })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.error || 'Erreur'); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    viewer.src = data.url;
+                    listPreview.innerHTML = `
+                        ✅ Fichier : ${data.filename}<br>
+                        ⏱️ Lien valable ${data.expires_in} secondes
+                    `;
+                })
+                .catch(error => {
+                    listPreview.innerHTML = `❌ Erreur : ${error.message}`;
+                    console.error('Erreur PDF:', error);
+                });
+        }
+
+        // ============================================================
+        //  DONNÉES DES COURRIERS
+        // ============================================================
+        let courriers = [];
+        let currentSelectedId = null;
+        let currentDisplayList = [];
+        let currentTab = 'arrive';
+
+        // ============================================================
+        //  CHARGEMENT DES DONNÉES
+        // ============================================================
+        function loadData() {
+            // ⚠️ REMPLACEZ CES DONNÉES PAR LES VÔTRES
+            courriers = [{
+                id: "1",
+                numero: "2024-001",
+                date: "2024-01-15",
+                expediteur: "Société ABC",
+                objet: "Facture janvier 2024",
+                contenu: "Facture n° F2024-001 d'un montant de 1500 DA",
+                type: "arrive",
+                priorite: "Normale",
+                pdfs: ["arrives/facture_2024-01.pdf"]
+            }, {
+                id: "2",
+                numero: "2024-002",
+                date: "2024-01-20",
+                expediteur: "شركة الأمل",
+                objet: "طلب عرض أسعار",
+                contenu: "طلب عرض أسعار للمشروع رقم P2024-002",
+                type: "arrive",
+                priorite: "Urgente",
+                pdfs: ["arrives/devis_2024-01.pdf"]
+            }, {
+                id: "3",
+                numero: "2024-003",
+                date: "2024-02-01",
+                expediteur: "وزارة الداخلية",
+                objet: "مذكرة رسمية",
+                contenu: "مذكرة رسمية بشأن تنظيم المكاتب",
+                type: "arrive",
+                priorite: "Normale",
+                pdfs: ["arrives/memoire_2024-02.pdf"]
+            }];
+
+            // Vérifier le serveur
+            checkServer();
+
+            currentDisplayList = [...courriers];
+            applyFilterByTab();
+        }
+
+        // ============================================================
+        //  AFFICHAGE
+        // ============================================================
+        function displayCourriers(list) {
+            const container = document.getElementById('courriersList');
+            const countSpan = document.getElementById('resultsCount');
+
+            countSpan.textContent = `${list.length} مراسلة (مراسلات)`;
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="emoji">📭</span>
+                        لا توجد مراسلات
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = list.map(c => {
+                const hasArabic = /[\u0600-\u06FF]/.test(c.expediteur + ' ' + c.objet);
+                const langClass = hasArabic ? 'badge-arabe' : 'badge-francais';
+                const langText = hasArabic ? 'العربية' : 'Français';
+                const isSelected = currentSelectedId === c.id;
+                const typeLabel = c.type === 'arrive' ? '📥 وارد' : '📤 صادر';
+                const typeClass = c.type === 'arrive' ? 'type-arrive' : 'type-depart';
+                const pdfCount = (c.pdfs || []).length;
+                const prioriteBadge = c.priorite === 'Urgente' ?
+                    '<span class="badge" style="background:#dc2626;">⚠️ عاجلة</span>' :
+                    '';
+
+                return `
+                    <div class="courrier-item ${isSelected ? 'selected' : ''}" onclick="selectCourrier('${c.id}')">
+                        <div class="numero">
+                            📄 ${escapeHtml(c.numero)}
+                            <span class="badge ${langClass}">${langText}</span>
+                            <span class="type-badge ${typeClass}">${typeLabel}</span>
+                            ${prioriteBadge}
+                            ${pdfCount > 0 ? `<span class="badge badge-pdf">📎 ${pdfCount} PDF</span>` : ''}
+                        </div>
+                        <div class="expediteur">✉️ ${escapeHtml(c.expediteur)}</div>
+                        <div class="objet">📌 ${escapeHtml(c.objet)}</div>
+                        <div class="date">📅 ${formatDate(c.date)}</div>
+                        ${pdfCount > 0 ? `
+                            <div class="pdf-attachment">
+                                📎 ${pdfCount} fichier(s) PDF :
+                                ${c.pdfs.map(p => `<a onclick="event.stopPropagation(); viewPdf('${escapeHtml(p)}')">📄 ${escapeHtml(p.split('/').pop())}</a>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        //  SELECTION
+        // ============================================================
+        function selectCourrier(id) {
+            currentSelectedId = id;
+            const courrier = courriers.find(c => c.id === id);
+
+            const detailsEl = document.getElementById('detailsContent');
+
+            if (!courrier) {
+                detailsEl.innerHTML = '<div class="empty-state"><span class="emoji">📄</span> Courrier introuvable</div>';
+                return;
+            }
+
+            const typeLabel = courrier.type === 'arrive' ? '📥 وارد' : '📤 صادر';
+            const expediteurLabel = courrier.type === 'arrive' ? '✉️ Expéditeur' : '✉️ Destinataire';
+
+            detailsEl.innerHTML = `
+                <div class="details-content">
+                    <p><strong>📝 Numéro :</strong> ${escapeHtml(courrier.numero)}</p>
+                    <p><strong>📅 Date :</strong> ${formatDate(courrier.date)}</p>
+                    <p><strong>${expediteurLabel} :</strong> ${escapeHtml(courrier.expediteur)}</p>
+                    <p><strong>📌 Objet :</strong> ${escapeHtml(courrier.objet)}</p>
+                    <p><strong>📌 Type :</strong> ${typeLabel}</p>
+                    ${courrier.priorite ? `<p><strong>⚠️ Priorité :</strong> ${courrier.priorite}</p>` : ''}
+                    ${courrier.contenu ? `<p><strong>📝 Contenu :</strong><br>${escapeHtml(courrier.contenu)}</p>` : ''}
+                    ${(courrier.pdfs || []).length > 0 ? `
+                        <p><strong>📎 PDF :</strong></p>
+                        ${courrier.pdfs.map(p => `<button onclick="viewPdf('${escapeHtml(p)}')" class="btn btn-sm btn-primary" style="margin:3px;">📄 ${escapeHtml(p.split('/').pop())}</button>`).join('')}
+                    ` : '<p><em>Aucun PDF attaché</em></p>'}
+                </div>
+            `;
+
+            displayCourriers(currentDisplayList);
+        }
+
+        // ============================================================
+        //  ONGLETS
+        // ============================================================
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const buttons = document.querySelectorAll('.tab-btn');
+            if (tab === 'arrive') buttons[0].classList.add('active');
+            else if (tab === 'depart') buttons[1].classList.add('active');
+            else buttons[2].classList.add('active');
+            applyFilterByTab();
+        }
+
+        function applyFilterByTab() {
+            let filtered = [...courriers];
+            if (currentTab === 'arrive') {
+                filtered = filtered.filter(c => c.type === 'arrive');
+            } else if (currentTab === 'depart') {
+                filtered = filtered.filter(c => c.type === 'depart');
+            }
+            currentDisplayList = filtered;
+            applySortAndDisplay();
+        }
+
+        // ============================================================
+        //  TRI
+        // ============================================================
+        function sortCourriers(list, sortType) {
+            const sorted = [...list];
+            switch (sortType) {
+                case 'date_desc':
+                    sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    break;
+                case 'date_asc':
+                    sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    break;
+                case 'numero':
+                    sorted.sort((a, b) => a.numero.localeCompare(b.numero, 'ar'));
+                    break;
+                case 'expediteur':
+                    sorted.sort((a, b) => a.expediteur.localeCompare(b.expediteur, 'ar'));
+                    break;
+                case 'objet':
+                    sorted.sort((a, b) => a.objet.localeCompare(b.objet, 'ar'));
+                    break;
+                default:
+                    sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+            return sorted;
+        }
+
+        function applySortAndDisplay() {
+            const sortType = document.getElementById('sortBy').value;
+            const sortedList = sortCourriers(currentDisplayList, sortType);
+            displayCourriers(sortedList);
+        }
+
+        // ============================================================
+        //  RECHERCHE
+        // ============================================================
+        function searchCourriers() {
+            const num = document.getElementById('searchNumero').value.toLowerCase();
+            const date = document.getElementById('searchDate').value;
+            const expediteur = document.getElementById('searchExpediteur').value.toLowerCase();
+            const objet = document.getElementById('searchObjet').value.toLowerCase();
+
+            let baseList = [...courriers];
+            if (currentTab === 'arrive') baseList = baseList.filter(c => c.type === 'arrive');
+            else if (currentTab === 'depart') baseList = baseList.filter(c => c.type === 'depart');
+
+            let results = baseList.filter(c => {
+                if (num && !c.numero.toLowerCase().includes(num)) return false;
+                if (date && c.date !== date) return false;
+                if (expediteur && !c.expediteur.toLowerCase().includes(expediteur)) return false;
+                if (objet && !c.objet.toLowerCase().includes(objet)) return false;
+                return true;
+            });
+
+            currentDisplayList = results;
+            displayCourriers(results);
+            document.getElementById('apercuZone').style.display = 'none';
+            currentSelectedId = null;
+
+            document.getElementById('detailsContent').innerHTML = `
+                <div class="empty-state">
+                    <span class="emoji">🔍</span>
+                    ${results.length} résultat(s) trouvé(s)
+                </div>
+            `;
+        }
+
+        function resetSearch() {
+            document.getElementById('searchNumero').value = '';
+            document.getElementById('searchDate').value = '';
+            document.getElementById('searchExpediteur').value = '';
+            document.getElementById('searchObjet').value = '';
+            applyFilterByTab();
+            document.getElementById('apercuZone').style.display = 'none';
+            currentSelectedId = null;
+
+            document.getElementById('detailsContent').innerHTML = `
+                <div class="empty-state">
+                    <span class="emoji">📄</span>
+                    Sélectionnez un courrier pour voir les détails
+                </div>
+            `;
+        }
+
+        // ============================================================
+        //  UTILITAIRES
+        // ============================================================
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            return dateStr;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // ============================================================
+        //  INITIALISATION
+        // ============================================================
+        loadData();
+
+        // Vérifier le serveur toutes les 30 secondes
+        setInterval(checkServer, 30000);
+    </script>
+</body>
+</html>
