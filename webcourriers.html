@@ -24,6 +24,111 @@
             margin: 0 auto;
         }
 
+        /* ====== ÉCRAN DE CONNEXION ====== */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            width: 400px;
+            max-width: 95%;
+        }
+
+        .login-box h1 {
+            text-align: center;
+            color: #1e3c72;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .login-box .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .login-box .form-group {
+            margin-bottom: 15px;
+        }
+
+        .login-box .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .login-box .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .login-box .form-group input:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        .login-box .btn-login {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .login-box .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4);
+        }
+
+        .login-box .error-msg {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .login-box .info-msg {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ====== HEADER ====== */
         .header {
             background: white;
             border-radius: 15px;
@@ -31,6 +136,39 @@
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             text-align: center;
+        }
+
+        .header .user-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header .user-bar .user-info-display {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 14px;
+        }
+
+        .header .user-bar .btn-logout {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #ef4444;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .header .user-bar .btn-logout:hover {
+            background: #dc2626;
         }
 
         .header h1 {
@@ -41,20 +179,6 @@
         .header p {
             color: #666;
             margin-top: 5px;
-        }
-
-        .header .status {
-            margin-top: 10px;
-            font-size: 13px;
-            color: #6b7280;
-        }
-
-        .header .status .online {
-            color: #10b981;
-        }
-
-        .header .status .offline {
-            color: #ef4444;
         }
 
         .header .admin-link {
@@ -146,15 +270,6 @@
         .btn-sm {
             padding: 5px 10px;
             font-size: 12px;
-        }
-
-        .btn-success {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
         }
 
         .courriers-list {
@@ -296,26 +411,6 @@
             margin-bottom: 10px;
         }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 3px solid #1e3c72;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
         .details-content {
             background: #f8fafc;
             padding: 15px;
@@ -405,14 +500,40 @@
 </head>
 <body>
 
-    <div class="container">
-        <!-- Header -->
+    <!-- ========================================== -->
+    <!-- ÉCRAN DE CONNEXION -->
+    <!-- ========================================== -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h1>📮 إدارة المراسلات</h1>
+            <p class="subtitle">🔐 Accès sécurisé</p>
+            
+            <div id="loginError" class="error-msg"></div>
+            
+            <div class="form-group">
+                <label>🔑 Mot de passe</label>
+                <input type="password" id="passwordInput" placeholder="Entrez le mot de passe" onkeydown="if(event.key==='Enter') checkPassword()">
+            </div>
+            <button class="btn-login" onclick="checkPassword()">🚪 Accéder</button>
+            <div style="text-align:center; margin-top:15px; font-size:12px; color:#999;">
+                🔒 Contactez l'administrateur pour obtenir le mot de passe
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- APPLICATION PRINCIPALE -->
+    <!-- ========================================== -->
+    <div id="appContent" class="container hidden">
         <div class="header">
+            <div class="user-bar">
+                <div class="user-info-display">
+                    👤 <span id="currentUserDisplay">Utilisateur</span>
+                </div>
+                <button class="btn-logout" onclick="deconnecter()">🚪 Déconnexion</button>
+            </div>
             <h1>📮 إدارة المراسلات - وارد / صادر</h1>
             <p>تتبع مراسلاتك الواردة والصادرة (بالعربية أو الفرنسية)</p>
-            <div class="status">
-                <span id="serverStatus">🔄 Connexion au serveur...</span>
-            </div>
             <div class="admin-link">
                 <a href="admin.html">⚙️ Accès administrateur</a>
             </div>
@@ -476,73 +597,88 @@
 
     <script>
         // ============================================================
-        //  🌐 CONFIGURATION DU SERVEUR
-        //  ⚠️ IMPORTANT : Mettez la bonne IP
+        //  🔐 MOT DE PASSE (À CHANGER !)
         // ============================================================
-        // Si le serveur est sur le même PC : http://localhost:5000
-        // Si le serveur est sur un autre PC du réseau : http://192.168.1.100:5000
-        const SERVER_URL = "http://localhost:5000";
+        const APP_PASSWORD = "Admin2024Secure!";
 
         // ============================================================
-        //  📡 VÉRIFICATION DU SERVEUR
+        //  AUTHENTIFICATION
         // ============================================================
-        function checkServer() {
-            const statusEl = document.getElementById('serverStatus');
+        function checkPassword() {
+            const input = document.getElementById('passwordInput');
+            const error = document.getElementById('loginError');
+            const password = input.value;
 
-            fetch(`${SERVER_URL}/api/health`)
-                .then(response => {
-                    if (response.ok) {
-                        statusEl.innerHTML = '🟢 Serveur connecté - PDF disponibles';
-                        statusEl.className = 'online';
-                    } else {
-                        statusEl.innerHTML = '🟡 Serveur inaccessible';
-                        statusEl.className = 'offline';
-                    }
-                })
-                .catch(() => {
-                    statusEl.innerHTML = '🔴 Serveur non accessible - Vérifiez que server.py est lancé';
-                    statusEl.className = 'offline';
-                });
+            if (!password) {
+                error.textContent = '❌ Veuillez entrer le mot de passe';
+                error.style.display = 'block';
+                return;
+            }
+
+            if (password === APP_PASSWORD) {
+                error.style.display = 'none';
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appContent').classList.remove('hidden');
+                document.getElementById('currentUserDisplay').textContent = 'Utilisateur autorisé';
+                // Sauvegarder la session
+                localStorage.setItem('courriers_session', 'true');
+                // Charger les données
+                loadData();
+            } else {
+                error.textContent = '❌ Mot de passe incorrect';
+                error.style.display = 'block';
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function deconnecter() {
+            localStorage.removeItem('courriers_session');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appContent').classList.add('hidden');
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('loginError').style.display = 'none';
         }
 
         // ============================================================
-        //  📄 AFFICHAGE DES PDF (via le serveur)
+        //  VÉRIFICATION DE LA SESSION
+        // ============================================================
+        function checkSession() {
+            const session = localStorage.getItem('courriers_session');
+            if (session === 'true') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appContent').classList.remove('hidden');
+                document.getElementById('currentUserDisplay').textContent = 'Utilisateur autorisé';
+                loadData();
+            }
+        }
+
+        // ============================================================
+        //  📄 AFFICHAGE DES PDF (sans serveur)
         // ============================================================
         function viewPdf(pdfPath) {
+            // Les PDF sont dans le dossier pdfs/ du même dépôt
             const viewer = document.getElementById('pdfViewer');
             const previewDiv = document.getElementById('apercuZone');
             const listPreview = document.getElementById('pdfListPreview');
 
-            // Afficher le chargement
-            listPreview.innerHTML = '<div class="loading-spinner"></div> 🔄 Chargement du PDF...';
-            previewDiv.style.display = 'block';
-            viewer.src = '';
+            if (!pdfPath) {
+                alert('Aucun PDF attaché à ce courrier');
+                return;
+            }
 
-            // Demander le PDF au serveur
-            fetch(`${SERVER_URL}/api/request-pdf`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ pdf_path: pdfPath })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw new Error(err.error || 'Erreur'); });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    viewer.src = data.url;
-                    listPreview.innerHTML = `
-                        ✅ Fichier : ${data.filename}<br>
-                        ⏱️ Lien valable ${data.expires_in} secondes
-                    `;
-                })
-                .catch(error => {
-                    listPreview.innerHTML = `❌ Erreur : ${error.message}`;
-                    console.error('Erreur PDF:', error);
-                });
+            const url = "pdfs/" + pdfPath;
+            listPreview.innerHTML = '🔄 Chargement du PDF...';
+            previewDiv.style.display = 'block';
+            viewer.src = url;
+
+            // Vérifier si le fichier existe
+            viewer.onload = function() {
+                listPreview.innerHTML = '✅ PDF chargé avec succès';
+            };
+            viewer.onerror = function() {
+                listPreview.innerHTML = '❌ Erreur : Fichier PDF introuvable<br>Vérifiez que le fichier existe dans le dossier pdfs/';
+            };
         }
 
         // ============================================================
@@ -589,9 +725,6 @@
                 priorite: "Normale",
                 pdfs: ["arrives/memoire_2024-02.pdf"]
             }];
-
-            // Vérifier le serveur
-            checkServer();
 
             currentDisplayList = [...courriers];
             applyFilterByTab();
@@ -818,10 +951,8 @@
         // ============================================================
         //  INITIALISATION
         // ============================================================
-        loadData();
-
-        // Vérifier le serveur toutes les 30 secondes
-        setInterval(checkServer, 30000);
+        // Vérifier la session au chargement
+        checkSession();
     </script>
 </body>
 </html>
