@@ -417,26 +417,6 @@
             margin-top: 3px;
         }
 
-        .server-status {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 15px;
-            padding: 8px;
-            background: #f3f4f6;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .server-status .connected {
-            color: #10b981;
-            font-weight: 600;
-        }
-
-        .server-status .disconnected {
-            color: #dc2626;
-            font-weight: 600;
-        }
-
         @media (max-width: 650px) {
             .login-container {
                 padding: 20px;
@@ -489,10 +469,6 @@
 
         <div id="loginError" class="error-msg"></div>
 
-        <div class="server-status">
-            📡 Serveur : <span id="serverStatus">Connexion en cours...</span>
-        </div>
-
         <div class="form-group">
             <label>🔑 Mot de passe administrateur</label>
             <input type="password" id="adminPassword" placeholder="Entrez le mot de passe">
@@ -511,10 +487,6 @@
         <p class="subtitle">Création, blocage et suppression des comptes</p>
 
         <div id="adminMsg" class="info-msg"></div>
-
-        <div class="server-status">
-            📡 Serveur : <span id="serverStatusPanel">Connexion en cours...</span>
-        </div>
 
         <!-- Formulaire de création -->
         <div style="text-align:left; margin-bottom:20px;">
@@ -598,36 +570,9 @@
 
     <script>
         // ============================================================
-        //  🔐 CONFIGURATION
+        //  🔐 MOT DE PASSE ADMINISTRATEUR (À CHANGER !)
         // ============================================================
-        // ⚠️ IMPORTANT : Remplacez par l'URL de votre serveur
-        const SERVER_URL = "http://localhost:5000";
         const ADMIN_PASSWORD = "Admin2024Secure!";
-
-        // ============================================================
-        //  📡 VÉRIFICATION DU SERVEUR
-        // ============================================================
-        function checkServer() {
-            fetch(`${SERVER_URL}/api/health`)
-                .then(response => {
-                    if (response.ok) {
-                        document.querySelectorAll('#serverStatus, #serverStatusPanel').forEach(el => {
-                            el.textContent = '🟢 Connecté';
-                            el.className = 'connected';
-                        });
-                        return true;
-                    } else {
-                        throw new Error('Erreur');
-                    }
-                })
-                .catch(() => {
-                    document.querySelectorAll('#serverStatus, #serverStatusPanel').forEach(el => {
-                        el.textContent = '🔴 Non connecté - Vérifiez que le serveur est lancé';
-                        el.className = 'disconnected';
-                    });
-                    return false;
-                });
-        }
 
         // ============================================================
         //  🔑 GÉNÉRATEUR DE MOT DE PASSE
@@ -1021,9 +966,6 @@
             copyBtn.textContent = '📋 Copier';
             copyBtn.className = 'btn-copy';
         });
-
-        // Vérifier le serveur au chargement
-        checkServer();
 
         document.getElementById('loginScreen').style.display = 'block';
         document.getElementById('adminPanel').classList.add('hidden');
