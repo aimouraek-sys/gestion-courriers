@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📮 إدارة المراسلات - وارد / صادر</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
-        /* ====== STYLES COMPLETS ====== */
-        /* (Reprendre tous les styles de la version précédente) */
         * {
             margin: 0;
             padding: 0;
@@ -21,11 +20,10 @@
         }
 
         .container {
-            max-width: 1450px;
+            max-width: 1500px;
             margin: 0 auto;
         }
 
-        /* ============ ÉCRAN DE CONNEXION ============ */
         .login-screen {
             position: fixed;
             top: 0;
@@ -41,10 +39,10 @@
 
         .login-box {
             background: white;
-            padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            width: 400px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            width: 420px;
             max-width: 95%;
         }
 
@@ -115,16 +113,6 @@
             display: none;
         }
 
-        .login-box .info-msg {
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-            display: none;
-        }
-
         .login-box .footer-links {
             text-align: center;
             margin-top: 15px;
@@ -132,28 +120,16 @@
             font-size: 13px;
         }
 
-        .login-box .footer-links a {
-            color: #1e3c72;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .login-box .footer-links a:hover {
-            color: #2a5298;
-        }
-
         .hidden {
             display: none !important;
         }
 
-        /* ============ HEADER ============ */
         .header {
             background: white;
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
 
@@ -172,18 +148,20 @@
             font-weight: 600;
             color: #1e3c72;
             font-size: 14px;
-            text-align: right;
         }
 
-        .header .user-bar .user-info-display .user-name {
-            font-size: 16px;
-            display: block;
+        .header .user-bar .user-role {
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: #d1fae5;
+            color: #065f46;
+            margin-right: 8px;
         }
 
-        .header .user-bar .user-info-display .user-details {
-            font-weight: 400;
-            color: #6b7280;
-            font-size: 13px;
+        .header .user-bar .user-role.admin {
+            background: #fef3c7;
+            color: #92400e;
         }
 
         .header .user-bar .btn-logout {
@@ -200,7 +178,22 @@
 
         .header .user-bar .btn-logout:hover {
             background: #dc2626;
-            transform: scale(1.05);
+        }
+
+        .header .user-bar .btn-admin {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #8b5cf6;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .header .user-bar .btn-admin:hover {
+            background: #7c3aed;
         }
 
         .header h1 {
@@ -213,38 +206,6 @@
             margin-top: 5px;
         }
 
-        .header .info-dirs {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f0fdf4;
-            border-radius: 8px;
-            font-size: 13px;
-            color: #065f46;
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
-        .header .info-dirs .dir-arrive {
-            color: #065f46;
-            font-weight: 600;
-        }
-
-        .header .info-dirs .dir-depart {
-            color: #1e40af;
-            font-weight: 600;
-        }
-
-        .toolbar {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        /* ============ GRILLE ============ */
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -255,7 +216,7 @@
             background: white;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .card h2 {
@@ -263,6 +224,12 @@
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #eee;
+        }
+
+        .card .subtitle-card {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 15px;
         }
 
         .form-group {
@@ -276,27 +243,39 @@
             color: #333;
         }
 
-        .form-group input, 
-        .form-group textarea,
-        .form-group select {
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 10px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 14px;
             transition: all 0.3s;
+            font-family: inherit;
         }
 
         .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
             border-color: #1e3c72;
         }
 
         .form-group textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 60px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            min-width: 180px;
         }
 
         .form-group.type-first {
@@ -316,6 +295,68 @@
             border-color: #1e3c72;
             font-weight: 600;
             font-size: 16px;
+        }
+
+        .pdf-upload-section {
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px dashed #10b981;
+            margin-bottom: 20px;
+        }
+
+        .pdf-upload-section label {
+            font-weight: 600;
+            color: #065f46;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .pdf-upload-section .upload-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .pdf-upload-section .upload-row input[type="file"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            min-width: 150px;
+        }
+
+        .pdf-upload-section .upload-row .btn {
+            white-space: nowrap;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .pdf-upload-section .file-info {
+            font-size: 12px;
+            color: #065f46;
+            margin-top: 5px;
+            display: none;
+            text-align: left;
+        }
+
+        .pdf-upload-section .hint {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 5px;
+            text-align: left;
+        }
+
+        .pdf-upload-section .hint strong {
+            color: #065f46;
+        }
+
+        .pdf-upload-section .locked-info {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 3px;
         }
 
         .btn {
@@ -338,13 +379,10 @@
             box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4);
         }
 
-        .btn-danger {
-            background: #dc2626;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #b91c1c;
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .btn-secondary {
@@ -354,6 +392,15 @@
 
         .btn-secondary:hover {
             background: #4b5563;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
         }
 
         .btn-success {
@@ -379,101 +426,51 @@
             font-size: 12px;
         }
 
-        .btn-file {
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .btn-import {
             background: #8b5cf6;
             color: white;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: inline-block;
-            font-size: 14px;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.3s;
         }
 
-        .btn-file:hover {
+        .btn-import:hover {
             background: #7c3aed;
-            transform: translateY(-2px);
-        }
-
-        .btn-remove-pdf {
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .btn-remove-pdf:hover {
-            background: #dc2626;
-            transform: scale(1.1);
-        }
-
-        .pdf-list {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .pdf-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 10px;
-            margin-bottom: 4px;
-            background: white;
-            border-radius: 6px;
-            border: 1px solid #e5e7eb;
-            font-size: 13px;
-        }
-
-        .pdf-list-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .pdf-list-item .pdf-name {
-            color: #1e3c72;
-            font-weight: 500;
-        }
-
-        .pdf-list-item .pdf-dir {
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background: #e5e7eb;
-            color: #4b5563;
-        }
-
-        .pdf-list-item .pdf-dir.arrive {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .pdf-list-item .pdf-dir.depart {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .search-bar {
-            margin-bottom: 20px;
         }
 
         .search-filters {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
             margin-bottom: 15px;
+        }
+
+        .search-filters input,
+        .search-filters select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .search-filters input:focus,
+        .search-filters select:focus {
+            outline: none;
+            border-color: #1e3c72;
         }
 
         .sort-section {
@@ -522,13 +519,13 @@
         }
 
         .tab-btn:hover {
-            background: rgba(255,255,255,0.5);
+            background: rgba(255, 255, 255, 0.5);
         }
 
         .tab-btn.active {
             background: white;
             color: #1e3c72;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .tab-btn.arrive {
@@ -540,7 +537,7 @@
         }
 
         .courriers-list {
-            max-height: 500px;
+            max-height: 450px;
             overflow-y: auto;
         }
 
@@ -557,11 +554,7 @@
         .courrier-item:hover {
             background: #f3f4f6;
             transform: translateX(5px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .courrier-item.urgent {
-            border-right: 4px solid #dc2626;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .courrier-item.selected {
@@ -593,7 +586,41 @@
             margin-top: 5px;
         }
 
-        .courrier-item .type-badge {
+        .courrier-item .doc-ref {
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: #dbeafe;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #1e40af;
+            display: inline-block;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-arabe {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-francais {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .badge-pdf {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .type-badge {
             display: inline-block;
             padding: 2px 10px;
             border-radius: 12px;
@@ -614,107 +641,31 @@
 
         .courrier-item .actions {
             margin-top: 10px;
-            display: flex;
-            gap: 10px;
         }
 
-        .pdf-attachment {
-            margin-top: 10px;
-            padding: 10px;
-            background: #fef3c7;
-            border-radius: 8px;
-        }
-
-        .pdf-attachment a {
-            color: #d97706;
-            text-decoration: none;
-            cursor: pointer;
-            display: inline-block;
-            margin-right: 10px;
-        }
-
-        .pdf-attachment a:hover {
-            text-decoration: underline;
-        }
-
-        .pdf-attachment .pdf-count {
-            font-size: 12px;
-            color: #92400e;
-            margin-right: 10px;
-        }
-
-        .pdf-attachment .pdf-dir-label {
-            font-size: 11px;
-            padding: 1px 6px;
-            border-radius: 8px;
-            margin-left: 5px;
-        }
-
-        .pdf-attachment .pdf-dir-label.arrive {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .pdf-attachment .pdf-dir-label.depart {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .apercu-pdf {
-            margin-top: 20px;
-            padding: 15px;
+        .details-content {
             background: #f8fafc;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .apercu-pdf h3 {
-            color: #475569;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .pdf-viewer {
-            width: 100%;
-            height: 400px;
-            border: none;
-            border-radius: 8px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-right: 10px;
-        }
-
-        .badge-arabe {
-            background: #10b981;
-            color: white;
-        }
-
-        .badge-francais {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .badge-pdf {
-            background: #f59e0b;
-            color: white;
-        }
-
-        [dir="rtl"] {
-            text-align: right;
-        }
-
-        .pdf-selector-area {
-            border: 2px dashed #c4b5fd;
-            border-radius: 8px;
             padding: 15px;
-            background: #faf5ff;
-            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+
+        .details-content p {
+            margin-bottom: 8px;
+        }
+
+        .details-content strong {
+            color: #1e3c72;
+        }
+
+        .details-content .doc-ref-code {
+            background: #e0e7ff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3c72;
+            display: inline-block;
         }
 
         .empty-state {
@@ -729,310 +680,421 @@
             margin-bottom: 10px;
         }
 
-        .info-dir {
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px 25px;
+            text-align: center;
+            min-width: 80px;
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .stat-label {
             font-size: 12px;
-            color: #6b7280;
-            margin-top: 5px;
-            padding: 5px 10px;
-            background: #f3f4f6;
+            color: #666;
+        }
+
+        .stat-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .stat-filters .form-group {
+            margin-bottom: 0;
+            min-width: 120px;
+        }
+
+        .doc-instruction {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: #92400e;
+        }
+
+        .doc-instruction strong {
+            color: #78350f;
+        }
+
+        .edit-mode-indicator {
+            background: #ffc107;
+            padding: 8px;
             border-radius: 6px;
+            text-align: center;
+            display: none;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #333;
         }
 
-        .info-dir .highlight-arrive {
-            color: #065f46;
-            font-weight: 600;
+        .apercu-pdf {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
         }
 
-        .info-dir .highlight-depart {
-            color: #1e40af;
-            font-weight: 600;
+        .pdf-viewer {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 8px;
         }
 
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
             }
-            
             .search-filters {
                 grid-template-columns: 1fr 1fr;
             }
-
-            .header .info-dirs {
+            .form-row {
                 flex-direction: column;
-                gap: 5px;
-                align-items: center;
             }
-
+            .form-row .form-group {
+                min-width: 100%;
+            }
+            .btn-group .btn {
+                min-width: 80px;
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+            .stats-container {
+                flex-direction: column;
+            }
+            .stat-box {
+                min-width: auto;
+            }
             .login-box {
                 padding: 25px;
-                width: 95%;
+            }
+            .pdf-upload-section .upload-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .pdf-upload-section .upload-row input[type="file"] {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .search-filters {
+                grid-template-columns: 1fr;
+            }
+            .header .user-bar {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .tabs {
+                flex-wrap: wrap;
+            }
+            .tab-btn {
+                flex: none;
+                padding: 8px 12px;
+                font-size: 13px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- ========================================== -->
-    <!-- ÉCRAN DE CONNEXION -->
-    <!-- ========================================== -->
+    <!-- ================================================================
+    ÉCRAN DE CONNEXION
+    ================================================================ -->
     <div id="loginScreen" class="login-screen">
         <div class="login-box">
             <h1>📮 إدارة المراسلات</h1>
             <p class="subtitle">تسجيل الدخول</p>
-            
             <div id="loginError" class="error-msg"></div>
-            <div id="loginInfo" class="info-msg"></div>
-            
-            <div id="loginForm">
-                <div class="form-group">
-                    <label>👤 اسم المستخدم</label>
-                    <input type="text" id="loginUsername" placeholder="أدخل اسم المستخدم">
-                </div>
-                <div class="form-group">
-                    <label>🔑 كلمة المرور</label>
-                    <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور">
-                </div>
-                <button class="btn-login" onclick="loginUser()">🚪 دخول</button>
-                <div class="footer-links">
-                    🔒 Si vous n'avez pas de compte, contactez l'administrateur<br>
-                    <small style="color:#999;">admin / admin123</small>
-                </div>
+            <div class="form-group">
+                <label>👤 اسم المستخدم</label>
+                <input type="text" id="loginUser" placeholder="أدخل اسم المستخدم">
             </div>
+            <div class="form-group">
+                <label>🔑 كلمة المرور</label>
+                <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter') loginUser()">
+            </div>
+            <button class="btn-login" onclick="loginUser()">🚪 دخول</button>
+            <div class="footer-links">🔒 اتصل بالمسؤول للحصول على حساب</div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- APPLICATION PRINCIPALE -->
-    <!-- ========================================== -->
+    <!-- ================================================================
+    APPLICATION PRINCIPALE
+    ================================================================ -->
     <div id="appContent" class="container hidden">
+
         <div class="header">
             <div class="user-bar">
                 <div class="user-info-display">
-                    <span class="user-name" id="currentUserName">👤 المستخدم: </span>
-                    <span class="user-details" id="currentUserDetails"></span>
+                    👤 <span id="currentUserDisplay">مستخدم</span>
+                    <span id="currentUserRole" class="user-role">جاري التحميل...</span>
                 </div>
-                <button class="btn-logout" onclick="logoutUser()">🚪 تسجيل خروج</button>
+                <div>
+                    <button class="btn-admin" onclick="window.location.href='admin.html'" id="adminBtn" style="display:none;">⚙️ إدارة</button>
+                    <button class="btn-logout" onclick="logoutUser()">🚪 تسجيل الخروج</button>
+                </div>
             </div>
             <h1>📮 إدارة المراسلات - وارد / صادر</h1>
-            <p>تتبع مراسلاتك الواردة والصادرة (بالعربية أو الفرنسية)</p>
-            <div class="info-dirs">
-                <span>📥 <span class="dir-arrive">PDF وارد</span> → <strong>pdfs/arrives/</strong></span>
-                <span>📤 <span class="dir-depart">PDF صادر</span> → <strong>pdfs/departs/</strong></span>
-            </div>
-            <div class="toolbar">
-                <button onclick="exportData()" class="btn btn-success">📤 تصدير البيانات</button>
-                <label for="importFile" class="btn btn-warning" style="cursor: pointer;">📥 استيراد بيانات</label>
-                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(this)">
-            </div>
+            <p>تتبع مراسلاتك الواردة والصادرة</p>
         </div>
 
-        <!-- ========================================== -->
-        <!-- GRILLE PRINCIPALE -->
-        <!-- ========================================== -->
         <div class="grid">
-            <!-- Formulaire d'ajout -->
+
+            <!-- ====== FORMULAIRE ====== -->
             <div class="card">
                 <h2 id="formTitle">➕ مراسلة جديدة</h2>
+                <div id="editModeIndicator" class="edit-mode-indicator">✏️ وضع التعديل - جاري التعديل</div>
+                <div class="subtitle-card" id="formSubtitle">أدخل معلومات المراسلة</div>
+
                 <form id="courrierForm">
+                    <input type="hidden" id="editIndex" value="-1">
+
+                    <!-- ====== SECTION CHARGEMENT PDF ====== -->
+                    <div class="pdf-upload-section">
+                        <label>📂 تحميل ملف PDF</label>
+                        <div class="upload-row">
+                            <input type="file" id="pdfFileInput" accept=".pdf">
+                            <button type="button" class="btn btn-sm btn-success" onclick="chargerPDF()">📥 تحميل</button>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="deverrouillerChamps()">🔓 فتح التعديل</button>
+                        </div>
+                        <div class="file-info" id="pdfFileInfo"></div>
+                        <div class="hint">💡 اختر ملفاً بالصيغة : <strong>001-15-01-2024.pdf</strong></div>
+                        <div class="locked-info" id="lockedInfo">🔒 الحقول مقفلة تلقائياً بعد التحميل</div>
+                    </div>
+
                     <div class="form-group type-first">
                         <label>📌 نوع المراسلة *</label>
-                        <select id="typeCourrier" onchange="updatePdfDirInfo()">
-                            <option value="arrive">📥 وارد (مستلم)</option>
-                            <option value="depart">📤 صادر (مرسل)</option>
+                        <select id="typeCourrier" required>
+                            <option value="arrive">📥 وارد</option>
+                            <option value="depart">📤 صادر</option>
                         </select>
-                        <div class="info-dir" id="pdfDirInfo">
-                            📎 سيتم حفظ PDF في: <span class="highlight-arrive">pdfs/arrives/</span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>📝 رقم المراسلة *</label>
+                            <input type="text" id="numero" placeholder="مثال: 2024-001" required>
+                        </div>
+                        <div class="form-group">
+                            <label>📅 التاريخ *</label>
+                            <input type="date" id="date" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label>📝 رقم المراسلة *</label>
-                        <input type="text" id="numero" required placeholder="مثال: 2024-001">
+                        <label id="expediteurLabel">👤 المرسل *</label>
+                        <input type="text" id="expediteur" placeholder="الاسم، المؤسسة..." required>
                     </div>
-                    <div class="form-group">
-                        <label>📅 التاريخ *</label>
-                        <input type="date" id="date" required>
-                    </div>
-                    <div class="form-group">
-                        <label>👤 المرسل / المستلم *</label>
-                        <input type="text" id="expediteur" required placeholder="الاسم، المؤسسة...">
-                    </div>
+
                     <div class="form-group">
                         <label>🏷️ الموضوع *</label>
-                        <input type="text" id="objet" required placeholder="موضوع المراسلة">
+                        <input type="text" id="objet" placeholder="موضوع المراسلة" required>
                     </div>
+
                     <div class="form-group">
                         <label>📄 المحتوى / ملاحظات</label>
                         <textarea id="contenu" placeholder="وصف تفصيلي..."></textarea>
                     </div>
-                    <div class="form-group">
-                        <label>⚠️ الأولوية</label>
-                        <select id="priorite">
-                            <option value="Normale">عادية</option>
-                            <option value="Urgente">عاجلة</option>
-                            <option value="Basse">منخفضة</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>📎 ملفات PDF</label>
-                        <div class="pdf-selector-area">
-                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                                <button type="button" class="btn-file" onclick="document.getElementById('pdfFileInput').click()">📂 إضافة PDF</button>
-                                <input type="file" id="pdfFileInput" accept=".pdf" style="display: none;" multiple onchange="addPdfs(this)">
-                                <span style="color: #6b7280; font-size: 13px;">يمكنك اختيار عدة ملفات دفعة واحدة</span>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>⚠️ الأولوية</label>
+                            <select id="priorite">
+                                <option value="Normale">عادية</option>
+                                <option value="Urgente">عاجلة</option>
+                                <option value="Basse">منخفضة</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>📄 مرجع PDF</label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="text" id="pdfRef" placeholder="مثال: 001-15-01-2024" style="flex:1;">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="genererReference()" style="white-space:nowrap; padding:8px 12px;">🔄 توليد</button>
                             </div>
-                            <div id="pdfListContainer" class="pdf-list" style="display: none;"></div>
+                            <div style="font-size:11px; color:#6b7280; margin-top:3px;">💡 يتم توليده تلقائياً من الرقم والتاريخ</div>
                         </div>
                     </div>
-                    
-                    <button type="submit" class="btn btn-primary" id="submitBtn">💾 حفظ المراسلة</button>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">💾 حفظ</button>
+                        <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;" onclick="cancelEdit()">❌ إلغاء</button>
+                    </div>
                 </form>
             </div>
 
-            <!-- Recherche et résultats -->
+            <!-- ====== RECHERCHE + LISTE ====== -->
             <div class="card">
                 <h2>🔍 بحث</h2>
-                
+
                 <div class="tabs">
-                    <button class="tab-btn arrive active" onclick="switchTab('arrive')">
-                        📥 الوارد
-                    </button>
-                    <button class="tab-btn depart" onclick="switchTab('depart')">
-                        📤 الصادر
-                    </button>
-                    <button class="tab-btn" onclick="switchTab('all')" style="flex: 0.5;">
-                        📋 الكل
-                    </button>
-                </div>
-                
-                <div class="search-bar">
-                    <div class="search-filters">
-                        <input type="text" id="searchNumero" placeholder="رقم المراسلة">
-                        <input type="date" id="searchDate" placeholder="التاريخ">
-                        <input type="text" id="searchExpediteur" placeholder="المرسل/المستلم">
-                        <input type="text" id="searchObjet" placeholder="كلمة مفتاحية">
-                        <select id="searchPriorite">
-                            <option value="">كل الأولويات</option>
-                            <option value="Urgente">عاجلة</option>
-                            <option value="Normale">عادية</option>
-                            <option value="Basse">منخفضة</option>
-                        </select>
-                    </div>
-                    
-                    <div class="sort-section">
-                        <label>📊 ترتيب حسب:</label>
-                        <select id="sortBy" onchange="applySortAndDisplay()">
-                            <option value="date_desc">📅 التاريخ (الأحدث أولاً)</option>
-                            <option value="date_asc">📅 التاريخ (الأقدم أولاً)</option>
-                            <option value="numero">🔢 الرقم</option>
-                            <option value="expediteur">👤 المرسل (أ-ي)</option>
-                            <option value="objet">📌 الموضوع (أ-ي)</option>
-                            <option value="priorite">⚠️ الأولوية (عاجلة أولاً)</option>
-                        </select>
-                    </div>
-                    
-                    <button onclick="searchCourriers()" class="btn btn-primary" style="width: 100%;">🔎 بحث</button>
-                    <button onclick="resetSearch()" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">🔄 إعادة تعيين</button>
+                    <button class="tab-btn arrive active" onclick="switchTab('arrive')">📥 الوارد</button>
+                    <button class="tab-btn depart" onclick="switchTab('depart')">📤 الصادر</button>
+                    <button class="tab-btn" onclick="switchTab('all')" style="flex:0.5;">📋 الكل</button>
                 </div>
 
-                <h2 style="margin-top: 20px;">📋 قائمة المراسلات</h2>
-                <div id="resultsCount" style="margin-bottom: 10px; color: #666;"></div>
+                <div class="search-filters">
+                    <input type="text" id="searchNumero" placeholder="رقم المراسلة">
+                    <input type="date" id="searchDate" placeholder="التاريخ">
+                    <input type="text" id="searchExpediteur" placeholder="المرسل/المستلم">
+                    <input type="text" id="searchObjet" placeholder="كلمة مفتاحية">
+                </div>
+
+                <div class="sort-section">
+                    <label>📊 ترتيب حسب:</label>
+                    <select id="sortBy" onchange="applySortAndDisplay()">
+                        <option value="date_desc">📅 التاريخ (الأحدث أولاً)</option>
+                        <option value="date_asc">📅 التاريخ (الأقدم أولاً)</option>
+                        <option value="numero">🔢 الرقم</option>
+                        <option value="expediteur">👤 المرسل (أ-ي)</option>
+                        <option value="objet">📌 الموضوع (أ-ي)</option>
+                    </select>
+                </div>
+
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
+                    <button onclick="searchCourriers()" class="btn btn-primary" style="flex:2;">🔎 بحث</button>
+                    <button onclick="resetSearch()" class="btn btn-secondary" style="flex:1;">🔄 إعادة تعيين</button>
+                </div>
+
+                <!-- Statistiques -->
+                <div style="margin-bottom:15px;">
+                    <div class="stat-filters">
+                        <div class="form-group"><label>تاريخ البداية</label><input type="date" id="statsDateDebut"></div>
+                        <div class="form-group"><label>تاريخ النهاية</label><input type="date" id="statsDateFin"></div>
+                        <button onclick="calculerStatistiques()" class="btn btn-sm btn-success" style="padding:10px 15px;">📈 حساب</button>
+                    </div>
+                    <div id="statsResultat" class="stats-container"></div>
+                </div>
+
+                <h2 style="margin-top:15px;">📋 قائمة المراسلات</h2>
+                <div id="resultsCount" style="margin-bottom:10px; color:#666;"></div>
                 <div id="courriersList" class="courriers-list"></div>
 
-                <div id="apercuZone" class="apercu-pdf" style="display: none;">
-                    <h3>📄 معاينة المستند</h3>
-                    <div id="pdfListPreview" style="margin-bottom: 10px;"></div>
-                    <iframe id="pdfViewer" class="pdf-viewer" src=""></iframe>
+                <div class="btn-group" style="margin-top:15px;">
+                    <button onclick="exportCSV()" class="btn btn-sm btn-success">📎 CSV</button>
+                    <button onclick="exportExcel()" class="btn btn-sm btn-success">📊 Excel</button>
+                    <label class="btn btn-sm btn-import" style="cursor:pointer; text-align:center;">
+                        📂 استيراد
+                        <input type="file" id="importFile" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importExcel(this)">
+                    </label>
+                    <button onclick="imprimerListe()" class="btn btn-sm btn-secondary">🖨️ طباعة</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- ====== ZONE D'APERÇU PDF ====== -->
+        <div id="apercuZone" class="card" style="margin-top:20px; display:none;">
+            <h3>📄 مرجع المستند</h3>
+            <div id="pdfListPreview" style="margin-bottom:10px;"></div>
+            <div class="doc-instruction">
+                📁 <strong>تعليمات :</strong><br>
+                1️⃣ انسخ المرجع أعلاه<br>
+                2️⃣ افتح المجلد <strong>C:\pdfs\</strong> أو المجلد المشترك<br>
+                3️⃣ ابحث عن الملف بهذا المرجع<br>
+                4️⃣ افتحه باستخدام قارئ PDF الخاص بك
             </div>
         </div>
     </div>
 
+    <!-- ================================================================
+    SCRIPTS
+    ================================================================ -->
     <script>
-        // ============================================================
-        // AUTHENTIFICATION
-        // ============================================================
-        let currentUser = null;
-        let currentUserData = null;
+        // ================================================================
+        //  🔐 AUTHENTIFICATION
+        // ================================================================
 
         function getUsers() {
             const data = localStorage.getItem('app_users');
             if (data) {
-                return JSON.parse(data);
+                try {
+                    const users = JSON.parse(data);
+                    const converted = {};
+                    for (const [key, value] of Object.entries(users)) {
+                        converted[key] = {
+                            password: value.password || value.pwd || 'password',
+                            role: value.role || 'user',
+                            name: value.name || value.service || key,
+                            service: value.service || '',
+                            societe: value.societe || '',
+                            blocked: value.blocked || false
+                        };
+                    }
+                    return converted;
+                } catch (e) { console.error('Erreur chargement utilisateurs', e); }
             }
-            // Si pas d'utilisateurs, créer le compte admin par défaut
             const defaultUsers = {
-                'admin': {
-                    password: 'admin123',
-                    service: 'Administration',
-                    societe: 'Système',
-                    isAdmin: true
-                }
+                'admin': { password: 'admin123', role: 'admin', name: 'Administrateur', service: 'Administration',
+                    societe: 'Système', blocked: false },
+                'user': { password: 'user123', role: 'user', name: 'Utilisateur', service: '', societe: '',
+                blocked: false }
             };
             localStorage.setItem('app_users', JSON.stringify(defaultUsers));
             return defaultUsers;
         }
 
-        function getCurrentUser() {
-            return localStorage.getItem('app_current_user') || null;
-        }
-
-        function setCurrentUser(username) {
-            if (username) {
-                localStorage.setItem('app_current_user', username);
-            } else {
-                localStorage.removeItem('app_current_user');
-            }
-            currentUser = username;
-            if (username) {
-                const users = getUsers();
-                currentUserData = users[username] || null;
-            } else {
-                currentUserData = null;
-            }
-        }
+        let currentUser = null;
+        let currentUserData = null;
+        let isAdmin = false;
 
         function loginUser() {
-            const username = document.getElementById('loginUsername').value.trim();
+            const username = document.getElementById('loginUser').value.trim();
             const password = document.getElementById('loginPassword').value;
+            const users = getUsers();
 
             if (!username || !password) {
                 showLoginError('الرجاء إدخال اسم المستخدم وكلمة المرور');
                 return;
             }
 
-            const users = getUsers();
-            
-            if (!users[username]) {
-                showLoginError('اسم المستخدم غير موجود');
-                return;
-            }
-            
-            if (users[username].password !== password) {
-                showLoginError('كلمة المرور غير صحيحة');
-                return;
-            }
+            if (!users[username]) { showLoginError('❌ اسم المستخدم غير موجود'); return; }
+            if (users[username].password !== password) { showLoginError('❌ كلمة المرور غير صحيحة'); return; }
+            if (users[username].blocked === true) { showLoginError('❌ هذا الحساب محظور. اتصل بالمسؤول.'); return; }
 
-            setCurrentUser(username);
-            document.getElementById('loginScreen').style.display = 'none';
+            currentUser = username;
+            currentUserData = users[username];
+            isAdmin = users[username].role === 'admin';
+
+            localStorage.setItem('courriers_session', JSON.stringify({ user: username, role: users[username].role }));
+
+            document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('appContent').classList.remove('hidden');
-            
             updateUserDisplay();
-            loadUserData();
+
+            if (isAdmin) { document.getElementById('adminBtn').style.display = 'inline-block'; }
+
+            loadData();
         }
 
         function logoutUser() {
-            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                setCurrentUser(null);
-                document.getElementById('loginScreen').style.display = 'flex';
-                document.getElementById('appContent').classList.add('hidden');
-                document.getElementById('loginPassword').value = '';
-                document.getElementById('loginError').style.display = 'none';
-                courriers = [];
-                currentDisplayList = [];
-                displayCourriers([]);
-            }
+            localStorage.removeItem('courriers_session');
+            currentUser = null;
+            currentUserData = null;
+            isAdmin = false;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appContent').classList.add('hidden');
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').style.display = 'none';
         }
 
         function showLoginError(msg) {
@@ -1041,139 +1103,506 @@
             el.style.display = 'block';
         }
 
-        function showLoginInfo(msg) {
-            const el = document.getElementById('loginInfo');
-            el.textContent = '💡 ' + msg;
-            el.style.display = 'block';
-        }
-
         function updateUserDisplay() {
-            const users = getUsers();
-            const data = users[currentUser];
-            if (data) {
-                document.getElementById('currentUserName').textContent = '👤 ' + currentUser;
-                let details = '';
-                if (data.service) details += '🏢 ' + data.service;
-                if (data.societe) details += (details ? ' | ' : '') + '🏛️ ' + data.societe;
-                document.getElementById('currentUserDetails').textContent = details;
+            const displayName = currentUserData.name || currentUserData.service || currentUser;
+            document.getElementById('currentUserDisplay').textContent = displayName;
+            const roleEl = document.getElementById('currentUserRole');
+            if (isAdmin) {
+                roleEl.textContent = '⭐ مسؤول';
+                roleEl.className = 'user-role admin';
+            } else {
+                roleEl.textContent = '👁️ مستخدم';
+                roleEl.className = 'user-role';
             }
         }
 
-        // Vérifier la session au chargement
         function checkSession() {
-            const user = getCurrentUser();
-            if (user) {
-                const users = getUsers();
-                if (users[user]) {
-                    currentUser = user;
-                    currentUserData = users[user];
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('appContent').classList.remove('hidden');
-                    updateUserDisplay();
-                    loadUserData();
-                    return true;
-                } else {
-                    setCurrentUser(null);
-                }
+            const session = localStorage.getItem('courriers_session');
+            if (session) {
+                try {
+                    const data = JSON.parse(session);
+                    const users = getUsers();
+                    if (users[data.user] && users[data.user].role === data.role) {
+                        currentUser = data.user;
+                        currentUserData = users[data.user];
+                        isAdmin = data.role === 'admin';
+                        document.getElementById('loginScreen').classList.add('hidden');
+                        document.getElementById('appContent').classList.remove('hidden');
+                        updateUserDisplay();
+                        if (isAdmin) { document.getElementById('adminBtn').style.display = 'inline-block'; }
+                        loadData();
+                        return true;
+                    }
+                } catch (e) {}
             }
             return false;
         }
 
-        // ============================================================
-        // GESTION DES DONNÉES PAR UTILISATEUR
-        // ============================================================
-        function getUserStorageKey() {
-            return 'courriers_' + currentUser;
+        // ================================================================
+        //  📂 CHARGEMENT PDF - EXTRACTION DES DONNÉES
+        //  Format : NNN-JJ-MM-AAAA.pdf
+        // ================================================================
+
+        let pdfFileSelected = null;
+
+        document.getElementById('pdfFileInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file && file.name.endsWith('.pdf')) {
+                pdfFileSelected = file;
+                extraireDonneesNomFichier(file.name);
+            } else {
+                pdfFileSelected = null;
+                document.getElementById('pdfFileInfo').style.display = 'none';
+                document.getElementById('pdfFileInfo').innerHTML = '';
+            }
+        });
+
+        function chargerPDF() {
+            document.getElementById('pdfFileInput').click();
         }
 
-        const PDF_DIR_ARRIVE = "pdfs/arrives/";
-        const PDF_DIR_DEPART = "pdfs/departs/";
-        let currentTab = 'arrive';
+        function extraireDonneesNomFichier(nomFichier) {
+            const nomSansExt = nomFichier.replace(/\.pdf$/i, '');
+            const parts = nomSansExt.split('-');
+
+            if (parts.length !== 4) {
+                const infoDiv = document.getElementById('pdfFileInfo');
+                infoDiv.style.display = 'block';
+                infoDiv.style.color = '#dc2626';
+                infoDiv.style.textAlign = 'left';
+                infoDiv.innerHTML = '⚠️ <span style="color:#dc2626;">صيغة الملف غير صالحة.</span><br>الصيغة المطلوبة : <strong>001-15-01-2024.pdf</strong>';
+                return;
+            }
+
+            const seqNum = parts[0];
+            const jour = parts[1];
+            const mois = parts[2];
+            const annee = parts[3];
+
+            if (seqNum.length < 1 || jour.length !== 2 || mois.length !== 2 || annee.length !== 4) {
+                const infoDiv = document.getElementById('pdfFileInfo');
+                infoDiv.style.display = 'block';
+                infoDiv.style.color = '#dc2626';
+                infoDiv.style.textAlign = 'left';
+                infoDiv.innerHTML = '⚠️ <span style="color:#dc2626;">صيغة الملف غير صالحة.</span><br>الصيغة المطلوبة : <strong>001-15-01-2024.pdf</strong>';
+                return;
+            }
+
+            const numeroComplet = annee + '-' + seqNum;
+
+            document.getElementById('numero').value = numeroComplet;
+            document.getElementById('date').value = annee + '-' + mois + '-' + jour;
+
+            const ref = seqNum + '-' + jour + '-' + mois + '-' + annee;
+            document.getElementById('pdfRef').value = ref;
+
+            document.getElementById('numero').readOnly = true;
+            document.getElementById('date').readOnly = true;
+            document.getElementById('pdfRef').readOnly = true;
+
+            document.getElementById('lockedInfo').innerHTML = '🔒 الحقول مقفلة (غير قابلة للتعديل) - اضغط "فتح التعديل" لتعديلها';
+
+            const infoDiv = document.getElementById('pdfFileInfo');
+            infoDiv.style.display = 'block';
+            infoDiv.style.color = '#065f46';
+            infoDiv.style.textAlign = 'left';
+            infoDiv.innerHTML = `
+                ✅ <span style="font-weight:600;">تم استخراج البيانات :</span><br>
+                📝 الرقم : <strong>${numeroComplet}</strong><br>
+                📅 التاريخ : <strong>${jour}/${mois}/${annee}</strong><br>
+                📄 المرجع : <strong>${ref}</strong><br>
+                <span style="font-size:11px; color:#6b7280;">📁 ${nomFichier}</span><br>
+                <span style="font-size:11px; color:#6b7280;">🔒 الحقول مقفلة للتعديل</span>
+            `;
+
+            ['numero', 'date', 'pdfRef'].forEach(id => {
+                const el = document.getElementById(id);
+                el.style.borderColor = '#10b981';
+                el.style.backgroundColor = '#f0fdf4';
+                setTimeout(() => { el.style.borderColor = '';
+                    el.style.backgroundColor = ''; }, 2000);
+            });
+
+            updateExpediteurLabel();
+        }
+
+        function deverrouillerChamps() {
+            document.getElementById('numero').readOnly = false;
+            document.getElementById('date').readOnly = false;
+            document.getElementById('pdfRef').readOnly = false;
+            document.getElementById('lockedInfo').innerHTML = '🔓 الحقول مفتوحة للتعديل';
+            const infoDiv = document.getElementById('pdfFileInfo');
+            if (infoDiv.style.display !== 'none') {
+                infoDiv.innerHTML += '<br>🔓 <span style="color:#6b7280;">تم فتح الحقول للتعديل</span>';
+            }
+        }
+
+        // ================================================================
+        //  🔄 GÉNÉRATION AUTOMATIQUE DE LA RÉFÉRENCE PDF
+        // ================================================================
+
+        function genererReference() {
+            const numero = document.getElementById('numero').value.trim();
+            const date = document.getElementById('date').value;
+
+            if (!numero || !date) {
+                alert('⚠️ Veuillez d\'abord saisir le numéro et la date du courrier.');
+                return;
+            }
+
+            const numParts = numero.split('-');
+            const seqNum = numParts[numParts.length - 1];
+            const dateParts = date.split('-');
+            const dateRef = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
+            const ref = seqNum + '-' + dateRef;
+
+            document.getElementById('pdfRef').value = ref;
+
+            const input = document.getElementById('pdfRef');
+            input.style.borderColor = '#10b981';
+            input.style.backgroundColor = '#f0fdf4';
+            setTimeout(() => { input.style.borderColor = '';
+                input.style.backgroundColor = ''; }, 1500);
+        }
+
+        document.getElementById('numero').addEventListener('change', function() {
+            if (this.value && document.getElementById('date').value) { genererReference(); }
+        });
+
+        document.getElementById('date').addEventListener('change', function() {
+            if (this.value && document.getElementById('numero').value) { genererReference(); }
+        });
+
+        // ================================================================
+        //  📄 AFFICHAGE DE LA RÉFÉRENCE
+        // ================================================================
+
+        function showDocumentReference(pdfRef) {
+            const previewDiv = document.getElementById('apercuZone');
+            const listPreview = document.getElementById('pdfListPreview');
+
+            if (!pdfRef) {
+                previewDiv.style.display = 'none';
+                return;
+            }
+
+            listPreview.innerHTML = `
+                <div style="background:#e0e7ff; padding:20px; border-radius:10px; text-align:center;">
+                    <div style="font-size:48px; margin-bottom:10px;">📄</div>
+                    <div style="font-size:24px; font-weight:bold; color:#1e3c72;">${escapeHtml(pdfRef)}</div>
+                    <div style="font-size:14px; color:#6b7280; margin-top:5px;">
+                        📁 الملف : ${escapeHtml(pdfRef)}.pdf
+                    </div>
+                    <button onclick="copyReference('${escapeHtml(pdfRef)}')" class="btn btn-success" style="margin-top:15px;">
+                        📋 نسخ المرجع
+                    </button>
+                </div>
+            `;
+
+            previewDiv.style.display = 'block';
+        }
+
+        function copyReference(ref) {
+            navigator.clipboard.writeText(ref).then(() => {
+                alert('✅ تم نسخ المرجع : ' + ref);
+            }).catch(() => {
+                const textArea = document.createElement('textarea');
+                textArea.value = ref;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('✅ تم نسخ المرجع : ' + ref);
+            });
+        }
+
+        // ================================================================
+        //  📊 DONNÉES ET STOCKAGE
+        // ================================================================
+
         let courriers = [];
         let currentSelectedId = null;
-        let selectedPdfFiles = [];
+        let currentDisplayList = [];
+        let currentTab = 'arrive';
         let editMode = false;
         let editId = null;
-        let currentDisplayList = [];
 
-        // ============================================================
-        // COMPATIBILITÉ
-        // ============================================================
-        function normalizeCourrier(courrier) {
-            const normalized = { ...courrier };
-            if (!normalized.type) normalized.type = 'arrive';
-            if (normalized.pdfName && !normalized.pdfNames) normalized.pdfNames = [normalized.pdfName];
-            if (!normalized.pdfName && !normalized.pdfNames) normalized.pdfNames = [];
-            if (normalized.pdfNames && normalized.pdfName) delete normalized.pdfName;
-            return normalized;
+        function getStorageKey() {
+            return 'courriers_data_' + (currentUser || 'default');
         }
 
-        function normalizeAllCourriers() {
-            courriers = courriers.map(c => normalizeCourrier(c));
-        }
-
-        function getPdfNames(courrier) {
-            if (courrier.pdfNames && Array.isArray(courrier.pdfNames)) {
-                return courrier.pdfNames;
-            } else if (courrier.pdfName) {
-                return [courrier.pdfName];
-            }
-            return [];
-        }
-
-        // ============================================================
-        // CHEMINS PDF
-        // ============================================================
-        function getPdfDir(type) {
-            return type === 'arrive' ? PDF_DIR_ARRIVE : PDF_DIR_DEPART;
-        }
-
-        function getPdfUrl(pdfName, type) {
-            if (!pdfName) return null;
-            const dir = getPdfDir(type);
-            return dir + encodeURIComponent(pdfName);
-        }
-
-        function updatePdfDirInfo() {
-            const type = document.getElementById('typeCourrier').value;
-            const infoDiv = document.getElementById('pdfDirInfo');
-            if (type === 'arrive') {
-                infoDiv.innerHTML = '📎 سيتم حفظ PDF في: <span class="highlight-arrive">pdfs/arrives/</span>';
-            } else {
-                infoDiv.innerHTML = '📎 سيتم حفظ PDF في: <span class="highlight-depart">pdfs/departs/</span>';
-            }
-        }
-
-        // ============================================================
-        // CHARGEMENT / SAUVEGARDE
-        // ============================================================
-        function loadUserData() {
-            const key = getUserStorageKey();
-            const saved = localStorage.getItem(key);
+        function loadData() {
+            const saved = localStorage.getItem(getStorageKey());
             if (saved) {
-                courriers = JSON.parse(saved);
-                normalizeAllCourriers();
-                saveData();
+                try { courriers = JSON.parse(saved); } catch (e) { courriers = []; }
             } else {
                 courriers = [];
+                saveData();
             }
             currentDisplayList = [...courriers];
             applyFilterByTab();
+            calculerStatistiques();
         }
 
         function saveData() {
-            const key = getUserStorageKey();
-            const toSave = courriers.map(c => {
-                const copy = { ...c };
-                if (copy.pdfNames && copy.pdfName) delete copy.pdfName;
-                return copy;
-            });
-            localStorage.setItem(key, JSON.stringify(toSave));
+            localStorage.setItem(getStorageKey(), JSON.stringify(courriers));
         }
 
-        // ============================================================
-        // ONGLETS
-        // ============================================================
+        // ================================================================
+        //  CRUD COURRIERS
+        // ================================================================
+
+        function resetForm() {
+            document.getElementById('courrierForm').reset();
+            document.getElementById('editIndex').value = '-1';
+            editMode = false;
+            editId = null;
+            document.getElementById('editModeIndicator').style.display = 'none';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.getElementById('formTitle').innerHTML = '➕ مراسلة جديدة';
+            document.getElementById('submitBtn').innerHTML = '💾 حفظ';
+            document.getElementById('formSubtitle').textContent = 'أدخل معلومات المراسلة';
+            document.getElementById('date').valueAsDate = new Date();
+            document.getElementById('pdfRef').value = '';
+            document.getElementById('numero').readOnly = false;
+            document.getElementById('date').readOnly = false;
+            document.getElementById('pdfRef').readOnly = false;
+            document.getElementById('lockedInfo').innerHTML = '🔒 الحقول مقفلة تلقائياً بعد التحميل';
+            document.getElementById('pdfFileInfo').style.display = 'none';
+            document.getElementById('pdfFileInfo').innerHTML = '';
+            document.getElementById('pdfFileInput').value = '';
+            updateExpediteurLabel();
+        }
+
+        function updateExpediteurLabel() {
+            const type = document.getElementById('typeCourrier').value;
+            document.getElementById('expediteurLabel').textContent = type === 'arrive' ? '👤 المرسل *' : '👤 المستلم *';
+        }
+
+        document.getElementById('typeCourrier').addEventListener('change', updateExpediteurLabel);
+
+        document.getElementById('courrierForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveCourrier();
+        });
+
+        function saveCourrier() {
+            const type = document.getElementById('typeCourrier').value;
+            const numero = document.getElementById('numero').value.trim();
+            const date = document.getElementById('date').value;
+            const expediteur = document.getElementById('expediteur').value.trim();
+            const objet = document.getElementById('objet').value.trim();
+            const contenu = document.getElementById('contenu').value.trim();
+            const priorite = document.getElementById('priorite').value;
+            const pdfRef = document.getElementById('pdfRef').value.trim();
+
+            if (!numero || !date || !expediteur || !objet) {
+                alert('الرجاء ملء جميع الحقول الإجبارية (*)');
+                return;
+            }
+
+            if (!isAdmin && !editMode) {
+                alert('⚠️ ليس لديك صلاحية لإضافة مراسلة.');
+                return;
+            }
+
+            const courrierData = {
+                id: editMode ? editId : Date.now() + Math.random(),
+                type: type,
+                numero: numero,
+                date: date,
+                expediteur: expediteur,
+                objet: objet,
+                contenu: contenu,
+                priorite: priorite,
+                pdfRef: pdfRef || '',
+                createdBy: currentUser,
+                createdAt: new Date().toISOString()
+            };
+
+            if (editMode && editId) {
+                const index = courriers.findIndex(c => c.id === editId);
+                if (index !== -1) {
+                    courriers[index] = { ...courriers[index], ...courrierData };
+                }
+            } else {
+                courriers.unshift(courrierData);
+            }
+
+            saveData();
+            resetForm();
+            applyFilterByTab();
+            calculerStatistiques();
+            alert(editMode ? '✅ تم تعديل المراسلة بنجاح' : '✅ تم إضافة المراسلة بنجاح');
+        }
+
+        function editCourrier(id) {
+            if (!isAdmin) {
+                alert('⚠️ ليس لديك صلاحية للتعديل.');
+                return;
+            }
+
+            const courrier = courriers.find(c => c.id === id);
+            if (!courrier) return;
+
+            editMode = true;
+            editId = id;
+
+            document.getElementById('typeCourrier').value = courrier.type || 'arrive';
+            document.getElementById('numero').value = courrier.numero || '';
+            document.getElementById('date').value = courrier.date || '';
+            document.getElementById('expediteur').value = courrier.expediteur || '';
+            document.getElementById('objet').value = courrier.objet || '';
+            document.getElementById('contenu').value = courrier.contenu || '';
+            document.getElementById('priorite').value = courrier.priorite || 'Normale';
+            document.getElementById('pdfRef').value = courrier.pdfRef || '';
+
+            document.getElementById('editIndex').value = id;
+            document.getElementById('editModeIndicator').style.display = 'block';
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+            document.getElementById('formTitle').innerHTML = '✏️ تعديل المراسلة';
+            document.getElementById('submitBtn').innerHTML = '💾 تحديث';
+            document.getElementById('formSubtitle').textContent = 'جاري التعديل...';
+
+            updateExpediteurLabel();
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() { resetForm(); }
+
+        function deleteCourrier(id) {
+            if (!isAdmin) {
+                alert('⚠️ ليس لديك صلاحية للحذف.');
+                return;
+            }
+            if (!confirm('هل أنت متأكد من حذف هذه المراسلة نهائياً؟')) return;
+
+            courriers = courriers.filter(c => c.id !== id);
+            saveData();
+            applyFilterByTab();
+            calculerStatistiques();
+
+            if (currentSelectedId === id) {
+                currentSelectedId = null;
+                document.getElementById('apercuZone').style.display = 'none';
+                document.getElementById('detailsContent').innerHTML =
+                    `<div class="empty-state"><span class="emoji">📄</span> اختر مراسلة لعرض التفاصيل</div>`;
+            }
+            alert('✅ تم حذف المراسلة');
+        }
+
+        // ================================================================
+        //  AFFICHAGE LISTE
+        // ================================================================
+
+        function displayCourriers(list) {
+            const container = document.getElementById('courriersList');
+            const countSpan = document.getElementById('resultsCount');
+
+            countSpan.textContent = `${list.length} مراسلة (مراسلات)`;
+
+            if (list.length === 0) {
+                container.innerHTML =
+                    `<div class="empty-state"><span class="emoji">📭</span> لا توجد مراسلات</div>`;
+                return;
+            }
+
+            container.innerHTML = list.map(c => {
+                const hasArabic = /[\u0600-\u06FF]/.test(c.expediteur + ' ' + c.objet);
+                const langClass = hasArabic ? 'badge-arabe' : 'badge-francais';
+                const langText = hasArabic ? 'العربية' : 'Français';
+                const isSelected = currentSelectedId === c.id;
+                const typeLabel = c.type === 'arrive' ? '📥 وارد' : '📤 صادر';
+                const typeClass = c.type === 'arrive' ? 'type-arrive' : 'type-depart';
+                const hasDoc = c.pdfRef ? true : false;
+                const prioriteLabels = {
+                    'Urgente': '<span class="badge" style="background:#dc2626;">⚠️ عاجلة</span>',
+                    'Normale': '<span class="badge" style="background:#10b981;">🟢 عادية</span>',
+                    'Basse': '<span class="badge" style="background:#6b7280;">🔵 منخفضة</span>'
+                };
+                const prioriteBadge = prioriteLabels[c.priorite] || '';
+
+                let actionsHtml = '';
+                if (isAdmin) {
+                    actionsHtml = `
+                        <div class="actions" onclick="event.stopPropagation();">
+                            <button class="btn btn-sm btn-warning" onclick="editCourrier(${c.id})">✏️ تعديل</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCourrier(${c.id})">🗑 حذف</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="courrier-item ${isSelected ? 'selected' : ''}" onclick="selectCourrier(${c.id})">
+                        <div class="numero">
+                            📄 ${escapeHtml(c.numero)}
+                            <span class="badge ${langClass}">${langText}</span>
+                            <span class="type-badge ${typeClass}">${typeLabel}</span>
+                            ${prioriteBadge}
+                            ${hasDoc ? `<span class="badge badge-pdf">📎 PDF</span>` : ''}
+                        </div>
+                        <div class="expediteur">✉️ ${escapeHtml(c.expediteur)}</div>
+                        <div class="objet">📌 ${escapeHtml(c.objet)}</div>
+                        <div class="date">📅 ${formatDate(c.date)}</div>
+                        ${hasDoc ? `<div class="doc-ref">📄 المرجع: <strong>${escapeHtml(c.pdfRef)}</strong></div>` : ''}
+                        ${actionsHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ================================================================
+        //  SELECTION
+        // ================================================================
+
+        function selectCourrier(id) {
+            currentSelectedId = id;
+            const courrier = courriers.find(c => c.id === id);
+
+            if (!courrier) {
+                document.getElementById('apercuZone').style.display = 'none';
+                document.getElementById('detailsContent').innerHTML =
+                    `<div class="empty-state"><span class="emoji">📄</span> المراسلة غير موجودة</div>`;
+                return;
+            }
+
+            if (courrier.pdfRef) {
+                showDocumentReference(courrier.pdfRef);
+            } else {
+                document.getElementById('apercuZone').style.display = 'none';
+            }
+
+            const typeLabel = courrier.type === 'arrive' ? '📥 وارد' : '📤 صادر';
+            const expediteurLabel = courrier.type === 'arrive' ? '✉️ المرسل' : '✉️ المستلم';
+            const prioriteLabels = { 'Urgente': '⚠️ عاجلة', 'Normale': '🟢 عادية', 'Basse': '🔵 منخفضة' };
+            const prioriteText = prioriteLabels[courrier.priorite] || '';
+
+            document.getElementById('detailsContent').innerHTML = `
+                <div class="details-content">
+                    <p><strong>📝 الرقم :</strong> ${escapeHtml(courrier.numero)}</p>
+                    <p><strong>📅 التاريخ :</strong> ${formatDate(courrier.date)}</p>
+                    <p><strong>${expediteurLabel} :</strong> ${escapeHtml(courrier.expediteur)}</p>
+                    <p><strong>📌 الموضوع :</strong> ${escapeHtml(courrier.objet)}</p>
+                    <p><strong>📌 النوع :</strong> ${typeLabel}</p>
+                    ${courrier.priorite ? `<p><strong>⚠️ الأولوية :</strong> ${prioriteText}</p>` : ''}
+                    ${courrier.contenu ? `<p><strong>📝 المحتوى :</strong><br>${escapeHtml(courrier.contenu)}</p>` : ''}
+                    ${courrier.pdfRef ? `
+                        <p><strong>📄 مرجع المستند :</strong></p>
+                        <div class="doc-ref-code">${escapeHtml(courrier.pdfRef)}</div>
+                        <p style="font-size:12px; color:#6b7280; margin-top:5px;">
+                            📁 الملف : ${escapeHtml(courrier.pdfRef)}.pdf
+                        </p>
+                    ` : '<p><em>لا يوجد مستند مرفق</em></p>'}
+                </div>
+            `;
+
+            displayCourriers(currentDisplayList);
+        }
+
+        // ================================================================
+        //  ONGLETS ET TRI
+        // ================================================================
+
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -1195,224 +1624,26 @@
             applySortAndDisplay();
         }
 
-        // ============================================================
-        // GESTION DES PDF
-        // ============================================================
-        function addPdfs(input) {
-            const files = input.files;
-            if (files.length === 0) return;
-            let addedCount = 0;
-            for (let file of files) {
-                if (file.type === 'application/pdf') {
-                    const exists = selectedPdfFiles.some(f => f.name === file.name && f.size === file.size);
-                    if (!exists) {
-                        selectedPdfFiles.push(file);
-                        addedCount++;
-                    }
-                }
-            }
-            if (addedCount > 0) {
-                updatePdfListDisplay();
-                alert(`✅ تمت إضافة ${addedCount} ملف(ات) PDF`);
-            } else {
-                alert('⚠️ لم تتم إضافة أي ملف. تأكد من اختيار ملفات PDF غير مكررة.');
-            }
-            input.value = '';
-        }
-
-        function removePdf(index) {
-            selectedPdfFiles.splice(index, 1);
-            updatePdfListDisplay();
-        }
-
-        function updatePdfListDisplay() {
-            const container = document.getElementById('pdfListContainer');
-            const type = document.getElementById('typeCourrier').value;
-            const dirLabel = type === 'arrive' ? '📥 وارد' : '📤 صادر';
-            const dirClass = type === 'arrive' ? 'arrive' : 'depart';
-            if (selectedPdfFiles.length === 0) {
-                container.style.display = 'none';
-                container.innerHTML = '';
-                return;
-            }
-            container.style.display = 'block';
-            container.innerHTML = selectedPdfFiles.map((file, index) => `
-                <div class="pdf-list-item">
-                    <span class="pdf-name">📎 ${escapeHtml(file.name)} (${(file.size / 1024).toFixed(1)} كيلوبايت)</span>
-                    <span class="pdf-dir ${dirClass}">${dirLabel}</span>
-                    <button type="button" class="btn-remove-pdf" onclick="removePdf(${index})">✕</button>
-                </div>
-            `).join('');
-        }
-
-        function clearSelectedPdfs() {
-            selectedPdfFiles = [];
-            updatePdfListDisplay();
-        }
-
-        // ============================================================
-        // AJOUT / MODIFICATION
-        // ============================================================
-        async function addCourrier(event) {
-            event.preventDefault();
-            const type = document.getElementById('typeCourrier').value;
-            const numero = document.getElementById('numero').value;
-            const date = document.getElementById('date').value;
-            const expediteur = document.getElementById('expediteur').value;
-            const objet = document.getElementById('objet').value;
-            const contenu = document.getElementById('contenu').value;
-            const priorite = document.getElementById('priorite').value;
-            
-            if (!numero || !date || !expediteur || !objet) {
-                alert('الرجاء ملء جميع الحقول الإجبارية (*)');
-                return;
-            }
-            
-            let pdfNames = [];
-            if (selectedPdfFiles.length > 0) {
-                for (let file of selectedPdfFiles) {
-                    pdfNames.push(file.name);
-                    const blob = new Blob([await file.arrayBuffer()], { type: 'application/pdf' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = file.name;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                }
-                const dirName = type === 'arrive' ? 'arrives' : 'departs';
-                setTimeout(() => {
-                    alert(`💡 نصيحة: ضع الملفات التي تم تحميلها (${pdfNames.join(', ')}) في المجلد "pdfs/${dirName}/"`);
-                }, 500);
-            }
-            
-            if (editMode && editId) {
-                const index = courriers.findIndex(c => c.id === editId);
-                if (index !== -1) {
-                    const existingPdfs = getPdfNames(courriers[index]);
-                    let finalPdfNames = pdfNames.length > 0 ? pdfNames : existingPdfs;
-                    if (pdfNames.length > 0 && existingPdfs.length > 0) {
-                        finalPdfNames = [...existingPdfs, ...pdfNames];
-                    }
-                    courriers[index] = {
-                        ...courriers[index],
-                        type: type,
-                        numero: numero,
-                        date: date,
-                        expediteur: expediteur,
-                        objet: objet,
-                        contenu: contenu,
-                        priorite: priorite,
-                        pdfNames: finalPdfNames,
-                        dateModification: new Date().toISOString()
-                    };
-                    delete courriers[index].pdfName;
-                }
-                editMode = false;
-                editId = null;
-                document.getElementById('formTitle').innerHTML = '➕ مراسلة جديدة';
-                document.getElementById('submitBtn').innerHTML = '💾 حفظ المراسلة';
-            } else {
-                const nouveauCourrier = {
-                    id: Date.now(),
-                    type: type,
-                    numero: numero,
-                    date: date,
-                    expediteur: expediteur,
-                    objet: objet,
-                    contenu: contenu,
-                    priorite: priorite,
-                    pdfNames: pdfNames,
-                    dateCreation: new Date().toISOString(),
-                    createdBy: currentUser
-                };
-                courriers.unshift(nouveauCourrier);
-            }
-            
-            saveData();
-            document.getElementById('courrierForm').reset();
-            document.getElementById('date').valueAsDate = new Date();
-            clearSelectedPdfs();
-            updatePdfDirInfo();
-            applyFilterByTab();
-            alert(editMode ? '✅ تم تعديل المراسلة بنجاح!' : '✅ تمت إضافة المراسلة بنجاح!');
-        }
-
-        // ============================================================
-        // AFFICHAGE
-        // ============================================================
-        function displayCourriers(courriersToShow) {
-            const container = document.getElementById('courriersList');
-            const countSpan = document.getElementById('resultsCount');
-            countSpan.textContent = `${courriersToShow.length} مراسلة (مراسلات)`;
-            
-            if (courriersToShow.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <span class="emoji">📭</span>
-                        لا توجد مراسلات ${currentTab === 'arrive' ? 'وارد' : currentTab === 'depart' ? 'صادر' : ''}
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = courriersToShow.map(c => {
-                const hasArabic = /[\u0600-\u06FF]/.test(c.expediteur + ' ' + c.objet);
-                const dir = hasArabic ? 'rtl' : 'ltr';
-                const langClass = hasArabic ? 'badge-arabe' : 'badge-francais';
-                const langText = hasArabic ? 'العربية' : 'Français';
-                const isSelected = currentSelectedId === c.id;
-                const pdfNames = getPdfNames(c);
-                const pdfCount = pdfNames.length;
-                const typeLabel = c.type === 'arrive' ? '📥 وارد' : '📤 صادر';
-                const typeClass = c.type === 'arrive' ? 'type-arrive' : 'type-depart';
-                const dirLabel = c.type === 'arrive' ? 'arrives' : 'departs';
-                
-                return `
-                    <div class="courrier-item ${c.priorite === 'Urgente' ? 'urgent' : ''} ${isSelected ? 'selected' : ''}" onclick="selectCourrier(${c.id})">
-                        <div class="numero">
-                            📄 ${escapeHtml(c.numero)}
-                            <span class="badge ${langClass}">${langText}</span>
-                            <span class="type-badge ${typeClass}">${typeLabel}</span>
-                            ${c.priorite === 'Urgente' ? '<span class="badge" style="background:#dc2626;">⚠️ عاجلة</span>' : ''}
-                            ${pdfCount > 0 ? `<span class="badge badge-pdf">📎 ${pdfCount} PDF</span>` : ''}
-                        </div>
-                        <div class="expediteur" dir="${dir}">${c.type === 'arrive' ? '✉️ من' : '✉️ إلى'}: ${escapeHtml(c.expediteur)}</div>
-                        <div class="objet" dir="${dir}">📌 الموضوع: ${escapeHtml(c.objet)}</div>
-                        <div class="date">📅 ${formatDate(c.date)}</div>
-                        ${c.contenu ? `<div class="objet" dir="${dir}" style="color:#888;">📝 ${escapeHtml(c.contenu.substring(0, 100))}${c.contenu.length > 100 ? '...' : ''}</div>` : ''}
-                        ${pdfCount > 0 ? `
-                            <div class="pdf-attachment">
-                                <span class="pdf-count">📎 ${pdfCount} fichier(s) PDF :</span>
-                                ${pdfNames.map(name => `<a onclick="event.stopPropagation(); viewPdf('${escapeHtml(name)}', '${c.type}')">${escapeHtml(name)}</a>`).join('')}
-                                <span class="pdf-dir-label ${c.type === 'arrive' ? 'arrive' : 'depart'}">📁 ${dirLabel}</span>
-                            </div>
-                        ` : ''}
-                        <div class="actions" onclick="event.stopPropagation()">
-                            <button class="btn btn-sm btn-danger" onclick="deleteCourrier(${c.id})">🗑 حذف</button>
-                            <button class="btn btn-sm btn-secondary" onclick="editCourrier(${c.id})">✏️ تعديل</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // ============================================================
-        // TRI ET RECHERCHE
-        // ============================================================
         function sortCourriers(list, sortType) {
             const sorted = [...list];
-            switch(sortType) {
-                case 'date_desc': sorted.sort((a, b) => new Date(b.date) - new Date(a.date)); break;
-                case 'date_asc': sorted.sort((a, b) => new Date(a.date) - new Date(b.date)); break;
-                case 'numero': sorted.sort((a, b) => a.numero.localeCompare(b.numero, 'ar')); break;
-                case 'expediteur': sorted.sort((a, b) => a.expediteur.localeCompare(b.expediteur, 'ar')); break;
-                case 'objet': sorted.sort((a, b) => a.objet.localeCompare(b.objet, 'ar')); break;
-                case 'priorite':
-                    const prioriteOrder = { 'Urgente': 0, 'Normale': 1, 'Basse': 2 };
-                    sorted.sort((a, b) => prioriteOrder[a.priorite] - prioriteOrder[b.priorite]);
+            switch (sortType) {
+                case 'date_desc':
+                    sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
                     break;
-                default: sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+                case 'date_asc':
+                    sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    break;
+                case 'numero':
+                    sorted.sort((a, b) => a.numero.localeCompare(b.numero, 'ar'));
+                    break;
+                case 'expediteur':
+                    sorted.sort((a, b) => a.expediteur.localeCompare(b.expediteur, 'ar'));
+                    break;
+                case 'objet':
+                    sorted.sort((a, b) => a.objet.localeCompare(b.objet, 'ar'));
+                    break;
+                default:
+                    sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
             }
             return sorted;
         }
@@ -1423,72 +1654,35 @@
             displayCourriers(sortedList);
         }
 
-        // ============================================================
-        // SELECTION ET APERCU
-        // ============================================================
-        function selectCourrier(id) {
-            currentSelectedId = id;
-            const courrier = courriers.find(c => c.id === id);
-            const previewDiv = document.getElementById('apercuZone');
-            const viewer = document.getElementById('pdfViewer');
-            const listPreview = document.getElementById('pdfListPreview');
-            const pdfNames = getPdfNames(courrier);
-            
-            if (courrier && pdfNames.length > 0) {
-                listPreview.innerHTML = pdfNames.map(name => `
-                    <button onclick="viewPdf('${escapeHtml(name)}', '${courrier.type}')" style="margin: 3px; padding: 6px 12px; background: #e0e7ff; border: 1px solid #1e3c72; border-radius: 6px; cursor: pointer; color: #1e3c72; font-weight: 500;">
-                        📎 ${escapeHtml(name)} ${courrier.type === 'arrive' ? '📥' : '📤'}
-                    </button>
-                `).join('');
-                const firstPdf = pdfNames[0];
-                const pdfUrl = getPdfUrl(firstPdf, courrier.type);
-                viewer.src = pdfUrl;
-                previewDiv.style.display = 'block';
-                viewer.onerror = function() {
-                    previewDiv.style.display = 'none';
-                    const dirName = courrier.type === 'arrive' ? 'arrives' : 'departs';
-                    alert(`❌ الملف غير موجود: "${firstPdf}"\n\nالرجاء وضع هذا الملف في المجلد "pdfs/${dirName}/"`);
-                };
-            } else {
-                previewDiv.style.display = 'none';
-                listPreview.innerHTML = '';
-                viewer.src = '';
-            }
-            applySortAndDisplay();
-        }
+        // ================================================================
+        //  RECHERCHE
+        // ================================================================
 
-        function viewPdf(pdfName, type) {
-            const pdfUrl = getPdfUrl(pdfName, type);
-            if (pdfUrl) window.open(pdfUrl, '_blank');
-        }
-
-        // ============================================================
-        // RECHERCHE
-        // ============================================================
         function searchCourriers() {
             const num = document.getElementById('searchNumero').value.toLowerCase();
             const date = document.getElementById('searchDate').value;
             const expediteur = document.getElementById('searchExpediteur').value.toLowerCase();
             const objet = document.getElementById('searchObjet').value.toLowerCase();
-            const priorite = document.getElementById('searchPriorite').value;
-            
+
             let baseList = [...courriers];
             if (currentTab === 'arrive') baseList = baseList.filter(c => c.type === 'arrive');
             else if (currentTab === 'depart') baseList = baseList.filter(c => c.type === 'depart');
-            
+
             let results = baseList.filter(c => {
                 if (num && !c.numero.toLowerCase().includes(num)) return false;
                 if (date && c.date !== date) return false;
                 if (expediteur && !c.expediteur.toLowerCase().includes(expediteur)) return false;
                 if (objet && !c.objet.toLowerCase().includes(objet)) return false;
-                if (priorite && c.priorite !== priorite) return false;
                 return true;
             });
-            
+
             currentDisplayList = results;
-            applySortAndDisplay();
+            displayCourriers(results);
             document.getElementById('apercuZone').style.display = 'none';
             currentSelectedId = null;
+
+            document.getElementById('detailsContent').innerHTML =
+                `<div class="empty-state"><span class="emoji">🔍</span> ${results.length} نتيجة (نتائج)</div>`;
         }
 
         function resetSearch() {
@@ -1496,129 +1690,178 @@
             document.getElementById('searchDate').value = '';
             document.getElementById('searchExpediteur').value = '';
             document.getElementById('searchObjet').value = '';
-            document.getElementById('searchPriorite').value = '';
             applyFilterByTab();
             document.getElementById('apercuZone').style.display = 'none';
             currentSelectedId = null;
+            document.getElementById('detailsContent').innerHTML =
+                `<div class="empty-state"><span class="emoji">📄</span> اختر مراسلة لعرض التفاصيل</div>`;
         }
 
-        // ============================================================
-        // SUPPRESSION ET MODIFICATION
-        // ============================================================
-        function deleteCourrier(id) {
-            if (confirm('هل أنت متأكد من حذف هذه المراسلة نهائياً؟')) {
-                courriers = courriers.filter(c => c.id !== id);
-                if (currentSelectedId === id) {
-                    document.getElementById('apercuZone').style.display = 'none';
-                    currentSelectedId = null;
-                }
-                if (editId === id) {
-                    editMode = false;
-                    editId = null;
-                    document.getElementById('formTitle').innerHTML = '➕ مراسلة جديدة';
-                    document.getElementById('submitBtn').innerHTML = '💾 حفظ المراسلة';
-                    document.getElementById('courrierForm').reset();
-                    document.getElementById('date').valueAsDate = new Date();
-                    clearSelectedPdfs();
-                    updatePdfDirInfo();
-                }
-                saveData();
-                applyFilterByTab();
-                alert('✅ تم حذف المراسلة');
-            }
-        }
+        // ================================================================
+        //  STATISTIQUES
+        // ================================================================
 
-        function editCourrier(id) {
-            const courrier = courriers.find(c => c.id === id);
-            if (!courrier) return;
-            editMode = true;
-            editId = id;
-            document.getElementById('typeCourrier').value = courrier.type || 'arrive';
-            document.getElementById('numero').value = courrier.numero;
-            document.getElementById('date').value = courrier.date;
-            document.getElementById('expediteur').value = courrier.expediteur;
-            document.getElementById('objet').value = courrier.objet;
-            document.getElementById('contenu').value = courrier.contenu || '';
-            document.getElementById('priorite').value = courrier.priorite || 'Normale';
-            updatePdfDirInfo();
-            clearSelectedPdfs();
-            const pdfNames = getPdfNames(courrier);
-            const container = document.getElementById('pdfListContainer');
-            const type = courrier.type || 'arrive';
-            const dirLabel = type === 'arrive' ? '📥 وارد' : '📤 صادر';
-            const dirClass = type === 'arrive' ? 'arrive' : 'depart';
-            if (pdfNames.length > 0) {
-                container.style.display = 'block';
-                container.innerHTML = pdfNames.map(name => `
-                    <div class="pdf-list-item">
-                        <span class="pdf-name">📎 ${escapeHtml(name)}</span>
-                        <span class="pdf-dir ${dirClass}">${dirLabel}</span>
-                        <span class="pdf-status">✅ موجود</span>
-                    </div>
-                `).join('');
-                container.innerHTML += `<div style="padding: 8px; color: #6b7280; font-size: 12px; border-top: 1px dashed #d1d5db; margin-top: 8px;">📌 يمكنك إضافة ملفات جديدة إضافية</div>`;
-            } else {
-                container.style.display = 'none';
-                container.innerHTML = '';
-            }
-            document.getElementById('formTitle').innerHTML = '✏️ تعديل مراسلة';
-            document.getElementById('submitBtn').innerHTML = '💾 حفظ التعديلات';
-            document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
-        }
+        function calculerStatistiques() {
+            const debut = document.getElementById('statsDateDebut').value;
+            const fin = document.getElementById('statsDateFin').value;
 
-        // ============================================================
-        // EXPORT / IMPORT
-        // ============================================================
-        function exportData() {
-            const cleanData = courriers.map(c => {
-                const copy = { ...c };
-                if (copy.pdfNames && copy.pdfName) delete copy.pdfName;
-                return copy;
+            let arrive = 0,
+                depart = 0;
+            let urgent = 0,
+                normal = 0,
+                basse = 0;
+
+            courriers.forEach(c => {
+                if (debut && c.date < debut) return;
+                if (fin && c.date > fin) return;
+
+                if (c.type === 'arrive') arrive++;
+                else if (c.type === 'depart') depart++;
+
+                if (c.priorite === 'Urgente') urgent++;
+                else if (c.priorite === 'Normale') normal++;
+                else if (c.priorite === 'Basse') basse++;
             });
-            const dataStr = JSON.stringify(cleanData, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
+
+            const total = arrive + depart;
+
+            document.getElementById('statsResultat').innerHTML = `
+                <div class="stat-box"><div class="stat-number">${total}</div><div class="stat-label">المجموع</div></div>
+                <div class="stat-box"><div class="stat-number">${arrive}</div><div class="stat-label">📥 وارد</div></div>
+                <div class="stat-box"><div class="stat-number">${depart}</div><div class="stat-label">📤 صادر</div></div>
+                <div class="stat-box"><div class="stat-number">${urgent}</div><div class="stat-label">⚠️ عاجل</div></div>
+            `;
+        }
+
+        // ================================================================
+        //  EXPORT / IMPORT
+        // ================================================================
+
+        function exportCSV() {
+            if (!courriers.length) { alert('لا توجد بيانات للتصدير'); return; }
+
+            let csv = 'الرقم;التاريخ;النوع;المرسل/المستلم;الموضوع;المحتوى;الأولوية;مرجع PDF\n';
+            courriers.forEach(c => {
+                const typeLabel = c.type === 'arrive' ? 'وارد' : 'صادر';
+                csv +=
+                    `"${c.numero}";"${c.date}";"${typeLabel}";"${c.expediteur}";"${c.objet}";"${c.contenu||''}";"${c.priorite||''}";"${c.pdfRef||''}"\n`;
+            });
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `courriers_${currentUser}_export_${new Date().toISOString().slice(0,19)}.json`;
+            a.download = `courriers_${new Date().toISOString().slice(0,10)}.csv`;
             a.click();
             URL.revokeObjectURL(url);
-            alert('✅ تم التصدير بنجاح!');
         }
 
-        async function importData(input) {
+        function exportExcel() {
+            if (!courriers.length) { alert('لا توجد بيانات للتصدير'); return; }
+
+            const data = [
+                ['الرقم', 'التاريخ', 'النوع', 'المرسل/المستلم', 'الموضوع', 'المحتوى', 'الأولوية', 'مرجع PDF']
+            ];
+            courriers.forEach(c => {
+                const typeLabel = c.type === 'arrive' ? 'وارد' : 'صادر';
+                data.push([c.numero, c.date, typeLabel, c.expediteur, c.objet, c.contenu || '', c.priorite || '',
+                    c.pdfRef || ''
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            ws['!cols'] = [{ wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 25 }, { wch: 30 }, { wch: 30 }, { wch: 12 },
+            { wch: 15 }];
+            XLSX.utils.book_append_sheet(wb, ws, 'Courriers');
+            XLSX.writeFile(wb, `courriers_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function importExcel(input) {
             const file = input.files[0];
             if (!file) return;
-            if (confirm('تحذير: الاستيراد سيحل محل جميع بياناتك الحالية. هل تريد المتابعة؟')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const imported = JSON.parse(e.target.result);
-                        courriers = imported;
-                        normalizeAllCourriers();
-                        saveData();
-                        applyFilterByTab();
-                        document.getElementById('apercuZone').style.display = 'none';
-                        currentSelectedId = null;
-                        editMode = false;
-                        editId = null;
-                        alert(`✅ تم الاستيراد بنجاح! ${courriers.length} مراسلة تم تحميلها`);
-                    } catch (err) {
-                        alert('خطأ: ملف JSON غير صالح');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+
+                    let count = 0;
+                    for (let i = 1; i < rows.length; i++) {
+                        const r = rows[i];
+                        if (r[0] && r[0].toString().trim()) {
+                            const type = r[2] && r[2].toString().includes('صادر') ? 'depart' : 'arrive';
+                            courriers.push({
+                                id: Date.now() + count + Math.random(),
+                                numero: r[0] ? String(r[0]).trim() : '',
+                                date: r[1] ? String(r[1]).trim() : '',
+                                type: type,
+                                expediteur: r[3] ? String(r[3]).trim() : '',
+                                objet: r[4] ? String(r[4]).trim() : '',
+                                contenu: r[5] ? String(r[5]).trim() : '',
+                                priorite: r[6] ? String(r[6]).trim() : 'Normale',
+                                pdfRef: r[7] ? String(r[7]).trim() : '',
+                                createdBy: currentUser,
+                                createdAt: new Date().toISOString()
+                            });
+                            count++;
+                        }
                     }
-                };
-                reader.readAsText(file);
-            }
+
+                    saveData();
+                    applyFilterByTab();
+                    calculerStatistiques();
+                    alert(`✅ تم استيراد ${count} مراسلة بنجاح`);
+                } catch (err) {
+                    alert('❌ خطأ أثناء الاستيراد : ' + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
             input.value = '';
         }
 
-        // ============================================================
-        // UTILITAIRES
-        // ============================================================
+        function imprimerListe() {
+            const list = currentDisplayList || courriers;
+            if (!list.length) { alert('لا توجد بيانات للطباعة'); return; }
+
+            let rows = '';
+            list.forEach(c => {
+                const typeLabel = c.type === 'arrive' ? 'وارد' : 'صادر';
+                rows += `<tr>
+                    <td>${c.numero||''}</td><td>${c.date||''}</td><td>${typeLabel}</td>
+                    <td>${c.expediteur||''}</td><td>${c.objet||''}</td><td>${c.pdfRef||''}</td>
+                </tr>`;
+            });
+
+            const win = window.open();
+            win.document.write(`
+                <html><head><title>قائمة المراسلات</title>
+                <style>body{font-family:Arial;padding:20px;direction:rtl}
+                table{border-collapse:collapse;width:100%;font-size:12px}
+                th,td{border:1px solid #000;padding:5px;text-align:right}
+                th{background:#1e3c72;color:white}</style>
+                </head><body>
+                <h1>📮 قائمة المراسلات</h1>
+                <p>${new Date().toLocaleDateString()} | ${list.length} مراسلة (مراسلات)</p>
+                <table><thead><tr><th>الرقم</th><th>التاريخ</th><th>النوع</th><th>المرسل/المستلم</th><th>الموضوع</th><th>مرجع PDF</th></tr></thead>
+                <tbody>${rows}</tbody></table>
+                </body></html>
+            `);
+            win.document.close();
+            win.print();
+        }
+
+        // ================================================================
+        //  UTILITAIRES
+        // ================================================================
+
         function formatDate(dateStr) {
             if (!dateStr) return '';
-            const [year, month, day] = dateStr.split('-');
-            return `${day}/${month}/${year}`;
+            const parts = dateStr.split('-');
+            if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            return dateStr;
         }
 
         function escapeHtml(str) {
@@ -1631,29 +1874,17 @@
                 .replace(/'/g, '&#39;');
         }
 
-        // ============================================================
-        // GESTION DES TOUCHES (Entrée pour connexion)
-        // ============================================================
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !document.getElementById('loginScreen').classList.contains('hidden')) {
-                loginUser();
-            }
-        });
+        // ================================================================
+        //  INITIALISATION
+        // ================================================================
 
-        // ============================================================
-        // INITIALISATION
-        // ============================================================
-        document.getElementById('courrierForm').addEventListener('submit', addCourrier);
         document.getElementById('date').valueAsDate = new Date();
-        updatePdfDirInfo();
 
-        // Vérifier la session au chargement
         if (!checkSession()) {
-            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('appContent').classList.add('hidden');
         } else {
-            // Afficher un message d'info
-           // showLoginInfo('🔑 Identifiants par défaut: admin / admin123');
+            setTimeout(calculerStatistiques, 500);
         }
     </script>
 </body>
