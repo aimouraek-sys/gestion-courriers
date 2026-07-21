@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📮 إدارة المراسلات - وارد / صادر</title>
+    <title>📮 Gestion des courriers - وارد / صادر</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
-        /* ====== STYLES (comme avant) ====== */
+        /* ================================================================
+           STYLES COMPLETS
+           ================================================================ */
         * {
             margin: 0;
             padding: 0;
@@ -20,17 +23,191 @@
         }
 
         .container {
-            max-width: 1450px;
+            max-width: 1500px;
             margin: 0 auto;
         }
 
+        /* ====== ÉCRAN DE CONNEXION ====== */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            width: 420px;
+            max-width: 95%;
+        }
+
+        .login-box h1 {
+            text-align: center;
+            color: #1e3c72;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .login-box .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .login-box .form-group {
+            margin-bottom: 15px;
+        }
+
+        .login-box .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .login-box .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .login-box .form-group input:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        .login-box .btn-login {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .login-box .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4);
+        }
+
+        .login-box .error-msg {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .login-box .info-msg {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .login-box .footer-links {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ====== HEADER ====== */
         .header {
             background: white;
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             text-align: center;
+        }
+
+        .header .user-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header .user-bar .user-info-display {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 14px;
+        }
+
+        .header .user-bar .user-role {
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .header .user-bar .user-role.admin {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .header .user-bar .btn-logout {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #ef4444;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .header .user-bar .btn-logout:hover {
+            background: #dc2626;
+        }
+
+        .header .user-bar .btn-admin {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #8b5cf6;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .header .user-bar .btn-admin:hover {
+            background: #7c3aed;
         }
 
         .header h1 {
@@ -43,21 +220,7 @@
             margin-top: 5px;
         }
 
-        .header .admin-link {
-            margin-top: 10px;
-        }
-
-        .header .admin-link a {
-            color: #8b5cf6;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .header .admin-link a:hover {
-            text-decoration: underline;
-        }
-
+        /* ====== GRILLE ====== */
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -68,7 +231,7 @@
             background: white;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .card h2 {
@@ -78,6 +241,172 @@
             border-bottom: 2px solid #eee;
         }
 
+        .card .subtitle-card {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 15px;
+        }
+
+        /* ====== FORMULAIRE ====== */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .form-group.type-first {
+            background: #f0f4ff;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 2px solid #1e3c72;
+            margin-bottom: 20px;
+        }
+
+        .form-group.type-first label {
+            color: #1e3c72;
+            font-size: 16px;
+        }
+
+        .form-group.type-first select {
+            border-color: #1e3c72;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* ====== BOUTONS ====== */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .btn-import {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .btn-import:hover {
+            background: #7c3aed;
+        }
+
+        /* ====== LISTE ====== */
         .search-filters {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -100,195 +429,27 @@
             border-color: #1e3c72;
         }
 
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4);
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #4b5563;
-        }
-
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-
-        .btn-success {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .courriers-list {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .courrier-item {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .courrier-item:hover {
+        .sort-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
             background: #f3f4f6;
-            transform: translateX(5px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            flex-wrap: wrap;
         }
 
-        .courrier-item.selected {
-            background: #e0e7ff;
-            border: 2px solid #1e3c72;
-        }
-
-        .courrier-item .numero {
-            font-weight: bold;
-            color: #1e3c72;
-            font-size: 16px;
-        }
-
-        .courrier-item .expediteur {
+        .sort-section label {
             font-weight: 600;
             color: #333;
-            margin-top: 5px;
         }
 
-        .courrier-item .objet {
-            color: #666;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .courrier-item .date {
-            color: #999;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        .courrier-item .doc-ref {
-            margin-top: 8px;
-            padding: 8px 12px;
-            background: #dbeafe;
+        .sort-section select {
+            padding: 8px;
             border-radius: 6px;
-            font-size: 13px;
-            color: #1e40af;
-            display: inline-block;
-        }
-
-        .courrier-item .doc-ref strong {
-            font-weight: 700;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-right: 10px;
-        }
-
-        .badge-arabe {
-            background: #10b981;
-            color: white;
-        }
-
-        .badge-francais {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .badge-pdf {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .type-badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-right: 8px;
-        }
-
-        .type-arrive {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .type-depart {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .apercu-pdf {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8fafc;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .pdf-viewer {
-            width: 100%;
-            height: 400px;
-            border: none;
-            border-radius: 8px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-
-        .empty-state .emoji {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .details-content {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .details-content p {
-            margin-bottom: 8px;
-        }
-
-        .details-content strong {
-            color: #1e3c72;
+            border: 1px solid #d1d5db;
+            background: white;
         }
 
         .tabs {
@@ -331,29 +492,193 @@
             border-right: 3px solid #3b82f6;
         }
 
-        .sort-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: #f3f4f6;
-            border-radius: 8px;
-            flex-wrap: wrap;
+        .courriers-list {
+            max-height: 450px;
+            overflow-y: auto;
         }
 
-        .sort-section label {
+        .courrier-item {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .courrier-item:hover {
+            background: #f3f4f6;
+            transform: translateX(5px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .courrier-item.selected {
+            background: #e0e7ff;
+            border: 2px solid #1e3c72;
+        }
+
+        .courrier-item .numero {
+            font-weight: bold;
+            color: #1e3c72;
+            font-size: 16px;
+        }
+
+        .courrier-item .expediteur {
             font-weight: 600;
             color: #333;
+            margin-top: 5px;
         }
 
-        .sort-section select {
-            padding: 8px;
+        .courrier-item .objet {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .courrier-item .date {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .courrier-item .doc-ref {
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: #dbeafe;
             border-radius: 6px;
-            border: 1px solid #d1d5db;
-            background: white;
+            font-size: 13px;
+            color: #1e40af;
+            display: inline-block;
         }
 
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-arabe {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-francais {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .badge-pdf {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .type-arrive {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .type-depart {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .courrier-item .actions {
+            margin-top: 10px;
+        }
+
+        /* ====== DÉTAILS ====== */
+        .details-content {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .details-content p {
+            margin-bottom: 8px;
+        }
+
+        .details-content strong {
+            color: #1e3c72;
+        }
+
+        .details-content .doc-ref-code {
+            background: #e0e7ff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3c72;
+            display: inline-block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state .emoji {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* ====== STATISTIQUES ====== */
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px 25px;
+            text-align: center;
+            min-width: 100px;
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .stat-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .stat-filters .form-group {
+            margin-bottom: 0;
+            min-width: 120px;
+        }
+
+        /* ====== INSTRUCTIONS ====== */
         .doc-instruction {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -368,32 +693,194 @@
             color: #78350f;
         }
 
+        .edit-mode-indicator {
+            background: #ffc107;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            display: none;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* ====== RESPONSIVE ====== */
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
             }
             .search-filters {
+                grid-template-columns: 1fr 1fr;
+            }
+            .form-row {
+                flex-direction: column;
+            }
+            .form-row .form-group {
+                min-width: 100%;
+            }
+            .btn-group .btn {
+                min-width: 80px;
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+            .stats-container {
+                flex-direction: column;
+            }
+            .stat-box {
+                min-width: auto;
+            }
+            .login-box {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .search-filters {
                 grid-template-columns: 1fr;
+            }
+            .header .user-bar {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .tabs {
+                flex-wrap: wrap;
+            }
+            .tab-btn {
+                flex: none;
+                padding: 8px 12px;
+                font-size: 13px;
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Header -->
+    <!-- ================================================================
+    ÉCRAN DE CONNEXION
+    ================================================================ -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h1>📮 إدارة المراسلات</h1>
+            <p class="subtitle">تسجيل الدخول</p>
+
+            <div id="loginError" class="error-msg"></div>
+            <div id="loginInfo" class="info-msg"></div>
+
+            <div class="form-group">
+                <label>👤 Nom d'utilisateur</label>
+                <input type="text" id="loginUser" placeholder="Entrez votre nom d'utilisateur">
+            </div>
+            <div class="form-group">
+                <label>🔑 Mot de passe</label>
+                <input type="password" id="loginPassword" placeholder="Entrez votre mot de passe" onkeydown="if(event.key==='Enter') loginUser()">
+            </div>
+            <button class="btn-login" onclick="loginUser()">🚪 Se connecter</button>
+            <div class="footer-links">
+                🔒 Contactez l'administrateur pour obtenir un compte
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================
+    APPLICATION PRINCIPALE
+    ================================================================ -->
+    <div id="appContent" class="container hidden">
+
+        <!-- HEADER -->
         <div class="header">
+            <div class="user-bar">
+                <div class="user-info-display">
+                    👤 <span id="currentUserDisplay">Utilisateur</span>
+                    <span id="currentUserRole" class="user-role">Chargement...</span>
+                </div>
+                <div>
+                    <button class="btn-admin" onclick="window.location.href='admin.html'" id="adminBtn" style="display:none;">⚙️ Admin</button>
+                    <button class="btn-logout" onclick="logoutUser()">🚪 Déconnexion</button>
+                </div>
+            </div>
             <h1>📮 إدارة المراسلات - وارد / صادر</h1>
             <p>تتبع مراسلاتك الواردة والصادرة (بالعربية أو الفرنسية)</p>
-            <div class="admin-link">
-                <a href="admin.html">⚙️ Accès administrateur</a>
-            </div>
         </div>
 
         <div class="grid">
-            <!-- Recherche -->
+
+            <!-- ============================================================
+            COLONNE GAUCHE : FORMULAIRE
+            ============================================================ -->
             <div class="card">
-                <h2>🔍 بحث</h2>
+                <h2 id="formTitle">➕ Nouveau courrier</h2>
+                <div id="editModeIndicator" class="edit-mode-indicator">✏️ MODE ÉDITION - Modification en cours</div>
+                <div class="subtitle-card" id="formSubtitle">Saisissez les informations du courrier</div>
+
+                <form id="courrierForm">
+                    <input type="hidden" id="editIndex" value="-1">
+
+                    <!-- Type en premier -->
+                    <div class="form-group type-first">
+                        <label>📌 نوع المراسلة *</label>
+                        <select id="typeCourrier" required>
+                            <option value="arrive">📥 وارد (Reçu)</option>
+                            <option value="depart">📤 صادر (Envoyé)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>📝 Numéro *</label>
+                            <input type="text" id="numero" placeholder="Ex: 2024-001" required>
+                        </div>
+                        <div class="form-group">
+                            <label>📅 Date *</label>
+                            <input type="date" id="date" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label id="expediteurLabel">👤 Expéditeur *</label>
+                        <input type="text" id="expediteur" placeholder="Nom, société..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>🏷️ Objet *</label>
+                        <input type="text" id="objet" placeholder="Sujet du courrier" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>📄 Contenu / Notes</label>
+                        <textarea id="contenu" placeholder="Description détaillée..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>⚠️ Priorité</label>
+                            <select id="priorite">
+                                <option value="Normale">عادية (Normale)</option>
+                                <option value="Urgente">عاجلة (Urgente)</option>
+                                <option value="Basse">منخفضة (Basse)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>📄 Référence PDF</label>
+                            <input type="text" id="pdfRef" placeholder="Ex: DOC-2024-001">
+                            <div style="font-size:11px; color:#6b7280; margin-top:3px;">
+                                💡 Référence unique du fichier PDF (sans extension)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">💾 Enregistrer</button>
+                        <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none;" onclick="cancelEdit()">❌ Annuler</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ============================================================
+            COLONNE DROITE : RECHERCHE + LISTE
+            ============================================================ -->
+            <div class="card">
+                <h2>🔍 Recherche</h2>
 
                 <div class="tabs">
                     <button class="tab-btn arrive active" onclick="switchTab('arrive')">📥 الوارد</button>
@@ -419,65 +906,200 @@
                     </select>
                 </div>
 
-                <button onclick="searchCourriers()" class="btn btn-primary" style="width:100%;">🔎 بحث</button>
-                <button onclick="resetSearch()" class="btn btn-secondary" style="width:100%; margin-top:10px;">🔄 إعادة تعيين</button>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
+                    <button onclick="searchCourriers()" class="btn btn-primary" style="flex:2;">🔎 بحث</button>
+                    <button onclick="resetSearch()" class="btn btn-secondary" style="flex:1;">🔄 إعادة تعيين</button>
+                </div>
 
-                <h2 style="margin-top:20px;">📋 قائمة المراسلات</h2>
+                <!-- Statistiques -->
+                <div style="margin-bottom:15px;">
+                    <div class="stat-filters">
+                        <div class="form-group"><label>Date début</label><input type="date" id="statsDateDebut"></div>
+                        <div class="form-group"><label>Date fin</label><input type="date" id="statsDateFin"></div>
+                        <button onclick="calculerStatistiques()" class="btn btn-sm btn-success" style="padding:10px 15px;">📈 Calculer</button>
+                    </div>
+                    <div id="statsResultat" class="stats-container"></div>
+                </div>
+
+                <h2 style="margin-top:15px;">📋 Liste des courriers</h2>
                 <div id="resultsCount" style="margin-bottom:10px; color:#666;"></div>
                 <div id="courriersList" class="courriers-list"></div>
 
-                <div id="apercuZone" class="apercu-pdf" style="display:none;">
-                    <h3>📄 Référence du document</h3>
-                    <div id="pdfListPreview" style="margin-bottom:10px;"></div>
-                    <div id="docInstruction" class="doc-instruction">
-                        📁 <strong>Instructions :</strong><br>
-                        1️⃣ Copiez la référence ci-dessus<br>
-                        2️⃣ Ouvrez le dossier <strong>C:\pdfs\</strong> ou le dossier partagé<br>
-                        3️⃣ Recherchez le fichier avec cette référence<br>
-                        4️⃣ Ouvrez-le avec votre lecteur PDF
-                    </div>
+                <!-- Export / Import -->
+                <div class="btn-group" style="margin-top:15px;">
+                    <button onclick="exportCSV()" class="btn btn-sm btn-success">📎 CSV</button>
+                    <button onclick="exportExcel()" class="btn btn-sm btn-success">📊 Excel</button>
+                    <label class="btn btn-sm btn-import" style="cursor:pointer; text-align:center;">
+                        📂 Importer
+                        <input type="file" id="importFile" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importExcel(this)">
+                    </label>
+                    <button onclick="imprimerListe()" class="btn btn-sm btn-secondary">🖨️ Imprimer</button>
                 </div>
             </div>
+        </div>
 
-            <!-- Détails -->
-            <div class="card">
-                <h2>📋 Détails du courrier</h2>
-                <div id="detailsContent">
-                    <div class="empty-state">
-                        <span class="emoji">📄</span>
-                        Sélectionnez un courrier pour voir les détails
-                    </div>
-                </div>
+        <!-- ================================================================
+        ZONE D'APERÇU PDF (en bas)
+        ================================================================ -->
+        <div id="apercuZone" class="card" style="margin-top:20px; display:none;">
+            <h3>📄 Référence du document</h3>
+            <div id="pdfListPreview" style="margin-bottom:10px;"></div>
+            <div class="doc-instruction">
+                📁 <strong>Instructions :</strong><br>
+                1️⃣ Copiez la référence ci-dessus<br>
+                2️⃣ Ouvrez le dossier <strong>C:\pdfs\</strong> ou le dossier partagé<br>
+                3️⃣ Recherchez le fichier avec cette référence<br>
+                4️⃣ Ouvrez-le avec votre lecteur PDF
             </div>
         </div>
     </div>
 
+    <!-- ================================================================
+    SCRIPTS
+    ================================================================ -->
     <script>
-        // ============================================================
-        //  📄 AFFICHAGE DE LA RÉFÉRENCE (sans serveur, sans PDF en ligne)
-        // ============================================================
-        function showDocumentReference(pdfPath) {
-            const previewDiv = document.getElementById('apercuZone');
-            const listPreview = document.getElementById('pdfListPreview');
+        // ================================================================
+        //  🔐 AUTHENTIFICATION
+        // ================================================================
 
-            if (!pdfPath) {
-                listPreview.innerHTML = '❌ Aucun document attaché à ce courrier';
-                previewDiv.style.display = 'block';
+        // Utilisateurs par défaut
+        const DEFAULT_USERS = {
+            'admin': { password: 'admin123', role: 'admin', name: 'Administrateur' },
+            'user': { password: 'user123', role: 'user', name: 'Utilisateur' }
+        };
+
+        function getUsers() {
+            const data = localStorage.getItem('utilisateurs');
+            if (data) return JSON.parse(data);
+            localStorage.setItem('utilisateurs', JSON.stringify(DEFAULT_USERS));
+            return DEFAULT_USERS;
+        }
+
+        let currentUser = null;
+        let currentUserData = null;
+        let isAdmin = false;
+
+        function loginUser() {
+            const username = document.getElementById('loginUser').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const users = getUsers();
+
+            if (!username || !password) {
+                showLoginError('Veuillez entrer vos identifiants');
                 return;
             }
 
-            // Extraire le nom du fichier sans le chemin
-            const fileName = pdfPath.split('/').pop();
-            const ref = fileName.replace('.pdf', '');
+            if (!users[username]) {
+                showLoginError('❌ Utilisateur inconnu');
+                return;
+            }
+
+            if (users[username].password !== password) {
+                showLoginError('❌ Mot de passe incorrect');
+                return;
+            }
+
+            // Vérifier si l'utilisateur est bloqué
+            if (users[username].blocked === true) {
+                showLoginError('❌ Ce compte est bloqué. Contactez l\'administrateur.');
+                return;
+            }
+
+            currentUser = username;
+            currentUserData = users[username];
+            isAdmin = users[username].role === 'admin';
+
+            localStorage.setItem('courriers_session', JSON.stringify({
+                user: username,
+                role: users[username].role
+            }));
+
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appContent').classList.remove('hidden');
+            updateUserDisplay();
+
+            // Afficher le bouton admin si rôle admin
+            if (isAdmin) {
+                document.getElementById('adminBtn').style.display = 'inline-block';
+            }
+
+            loadData();
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('courriers_session');
+            currentUser = null;
+            currentUserData = null;
+            isAdmin = false;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appContent').classList.add('hidden');
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        function showLoginError(msg) {
+            const el = document.getElementById('loginError');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function updateUserDisplay() {
+            document.getElementById('currentUserDisplay').textContent = currentUserData.name || currentUser;
+            const roleEl = document.getElementById('currentUserRole');
+            if (isAdmin) {
+                roleEl.textContent = '⭐ Administrateur';
+                roleEl.className = 'user-role admin';
+            } else {
+                roleEl.textContent = '👁️ Utilisateur';
+                roleEl.className = 'user-role';
+            }
+        }
+
+        function checkSession() {
+            const session = localStorage.getItem('courriers_session');
+            if (session) {
+                try {
+                    const data = JSON.parse(session);
+                    const users = getUsers();
+                    if (users[data.user] && users[data.user].role === data.role) {
+                        currentUser = data.user;
+                        currentUserData = users[data.user];
+                        isAdmin = data.role === 'admin';
+                        document.getElementById('loginScreen').classList.add('hidden');
+                        document.getElementById('appContent').classList.remove('hidden');
+                        updateUserDisplay();
+                        if (isAdmin) {
+                            document.getElementById('adminBtn').style.display = 'inline-block';
+                        }
+                        loadData();
+                        return true;
+                    }
+                } catch (e) {}
+            }
+            return false;
+        }
+
+        // ================================================================
+        //  📄 AFFICHAGE DE LA RÉFÉRENCE
+        // ================================================================
+
+        function showDocumentReference(pdfRef) {
+            const previewDiv = document.getElementById('apercuZone');
+            const listPreview = document.getElementById('pdfListPreview');
+
+            if (!pdfRef) {
+                previewDiv.style.display = 'none';
+                return;
+            }
 
             listPreview.innerHTML = `
                 <div style="background:#e0e7ff; padding:20px; border-radius:10px; text-align:center;">
                     <div style="font-size:48px; margin-bottom:10px;">📄</div>
-                    <div style="font-size:24px; font-weight:bold; color:#1e3c72;">${escapeHtml(ref)}</div>
+                    <div style="font-size:24px; font-weight:bold; color:#1e3c72;">${escapeHtml(pdfRef)}</div>
                     <div style="font-size:14px; color:#6b7280; margin-top:5px;">
-                        📁 ${escapeHtml(pdfPath)}
+                        📁 Fichier : ${escapeHtml(pdfRef)}.pdf
                     </div>
-                    <button onclick="copyReference('${escapeHtml(ref)}')" class="btn btn-success" style="margin-top:15px;">
+                    <button onclick="copyReference('${escapeHtml(pdfRef)}')" class="btn btn-success" style="margin-top:15px;">
                         📋 Copier la référence
                     </button>
                 </div>
@@ -490,7 +1112,6 @@
             navigator.clipboard.writeText(ref).then(() => {
                 alert('✅ Référence copiée : ' + ref);
             }).catch(() => {
-                // Fallback
                 const textArea = document.createElement('textarea');
                 textArea.value = ref;
                 document.body.appendChild(textArea);
@@ -501,70 +1122,235 @@
             });
         }
 
-        // ============================================================
-        //  DONNÉES DES COURRIERS
-        // ============================================================
+        // ================================================================
+        //  📊 DONNÉES ET STOCKAGE
+        // ================================================================
+
         let courriers = [];
         let currentSelectedId = null;
         let currentDisplayList = [];
         let currentTab = 'arrive';
+        let editMode = false;
+        let editId = null;
 
-        // ============================================================
-        //  CHARGEMENT DES DONNÉES
-        // ============================================================
+        function getStorageKey() {
+            return 'courriers_data_' + (currentUser || 'default');
+        }
+
         function loadData() {
-            // ⚠️ REMPLACEZ CES DONNÉES PAR LES VÔTRES
-            // La référence du document = nom du fichier PDF (sans .pdf)
-            courriers = [{
-                id: "1",
-                numero: "2024-001",
-                date: "2024-01-15",
-                expediteur: "Société ABC",
-                objet: "Facture janvier 2024",
-                contenu: "Facture n° F2024-001 d'un montant de 1500 DA",
-                type: "arrive",
-                priorite: "Normale",
-                pdfRef: "DOC-2024-001"  // 👈 Référence à chercher dans C:\pdfs\arrives\
-            }, {
-                id: "2",
-                numero: "2024-002",
-                date: "2024-01-20",
-                expediteur: "شركة الأمل",
-                objet: "طلب عرض أسعار",
-                contenu: "طلب عرض أسعار للمشروع رقم P2024-002",
-                type: "arrive",
-                priorite: "Urgente",
-                pdfRef: "DOC-2024-002"
-            }, {
-                id: "3",
-                numero: "2024-003",
-                date: "2024-02-01",
-                expediteur: "وزارة الداخلية",
-                objet: "مذكرة رسمية",
-                contenu: "مذكرة رسمية بشأن تنظيم المكاتب",
-                type: "arrive",
-                priorite: "Normale",
-                pdfRef: "DOC-2024-003"
-            }];
+            const saved = localStorage.getItem(getStorageKey());
+            if (saved) {
+                try {
+                    courriers = JSON.parse(saved);
+                } catch (e) {
+                    courriers = [];
+                }
+            } else {
+                // Données d'exemple
+                courriers = [{
+                    id: 1,
+                    numero: "2024-001",
+                    date: "2024-01-15",
+                    expediteur: "Société ABC",
+                    objet: "Facture janvier 2024",
+                    contenu: "Facture n° F2024-001",
+                    type: "arrive",
+                    priorite: "Normale",
+                    pdfRef: "DOC-2024-001"
+                }, {
+                    id: 2,
+                    numero: "2024-002",
+                    date: "2024-01-20",
+                    expediteur: "شركة الأمل",
+                    objet: "طلب عرض أسعار",
+                    contenu: "Demande de devis pour projet P2024-002",
+                    type: "arrive",
+                    priorite: "Urgente",
+                    pdfRef: "DOC-2024-002"
+                }, {
+                    id: 3,
+                    numero: "2024-003",
+                    date: "2024-02-01",
+                    expediteur: "وزارة الداخلية",
+                    objet: "مذكرة رسمية",
+                    contenu: "Note officielle concernant l'organisation",
+                    type: "depart",
+                    priorite: "Normale",
+                    pdfRef: "DOC-2024-003"
+                }];
+                saveData();
+            }
 
             currentDisplayList = [...courriers];
             applyFilterByTab();
+            calculerStatistiques();
         }
 
-        // ============================================================
-        //  AFFICHAGE
-        // ============================================================
+        function saveData() {
+            localStorage.setItem(getStorageKey(), JSON.stringify(courriers));
+        }
+
+        // ================================================================
+        //  CRUD COURRIERS
+        // ================================================================
+
+        function resetForm() {
+            document.getElementById('courrierForm').reset();
+            document.getElementById('editIndex').value = '-1';
+            editMode = false;
+            editId = null;
+            document.getElementById('editModeIndicator').style.display = 'none';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.getElementById('formTitle').innerHTML = '➕ Nouveau courrier';
+            document.getElementById('submitBtn').innerHTML = '💾 Enregistrer';
+            document.getElementById('formSubtitle').textContent = 'Saisissez les informations du courrier';
+            document.getElementById('date').valueAsDate = new Date();
+            updateExpediteurLabel();
+        }
+
+        function updateExpediteurLabel() {
+            const type = document.getElementById('typeCourrier').value;
+            document.getElementById('expediteurLabel').textContent = type === 'arrive' ? '👤 Expéditeur *' : '👤 Destinataire *';
+        }
+
+        document.getElementById('typeCourrier').addEventListener('change', updateExpediteurLabel);
+
+        document.getElementById('courrierForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveCourrier();
+        });
+
+        function saveCourrier() {
+            const type = document.getElementById('typeCourrier').value;
+            const numero = document.getElementById('numero').value.trim();
+            const date = document.getElementById('date').value;
+            const expediteur = document.getElementById('expediteur').value.trim();
+            const objet = document.getElementById('objet').value.trim();
+            const contenu = document.getElementById('contenu').value.trim();
+            const priorite = document.getElementById('priorite').value;
+            const pdfRef = document.getElementById('pdfRef').value.trim();
+
+            if (!numero || !date || !expediteur || !objet) {
+                alert('Veuillez remplir tous les champs obligatoires (*)');
+                return;
+            }
+
+            // Vérifier les droits
+            if (!isAdmin && !editMode) {
+                alert('⚠️ Vous n\'avez pas les droits pour ajouter un courrier.');
+                return;
+            }
+
+            const courrierData = {
+                id: editMode ? editId : Date.now() + Math.random(),
+                type: type,
+                numero: numero,
+                date: date,
+                expediteur: expediteur,
+                objet: objet,
+                contenu: contenu,
+                priorite: priorite,
+                pdfRef: pdfRef || '',
+                createdBy: currentUser,
+                createdAt: new Date().toISOString()
+            };
+
+            if (editMode && editId) {
+                const index = courriers.findIndex(c => c.id === editId);
+                if (index !== -1) {
+                    courriers[index] = { ...courriers[index], ...courrierData };
+                }
+            } else {
+                courriers.unshift(courrierData);
+            }
+
+            saveData();
+            resetForm();
+            applyFilterByTab();
+            calculerStatistiques();
+            alert(editMode ? '✅ Courrier modifié avec succès' : '✅ Courrier enregistré avec succès');
+        }
+
+        function editCourrier(id) {
+            if (!isAdmin) {
+                alert('⚠️ Vous n\'avez pas les droits pour modifier.');
+                return;
+            }
+
+            const courrier = courriers.find(c => c.id === id);
+            if (!courrier) return;
+
+            editMode = true;
+            editId = id;
+
+            document.getElementById('typeCourrier').value = courrier.type || 'arrive';
+            document.getElementById('numero').value = courrier.numero || '';
+            document.getElementById('date').value = courrier.date || '';
+            document.getElementById('expediteur').value = courrier.expediteur || '';
+            document.getElementById('objet').value = courrier.objet || '';
+            document.getElementById('contenu').value = courrier.contenu || '';
+            document.getElementById('priorite').value = courrier.priorite || 'Normale';
+            document.getElementById('pdfRef').value = courrier.pdfRef || '';
+
+            document.getElementById('editIndex').value = id;
+            document.getElementById('editModeIndicator').style.display = 'block';
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+            document.getElementById('formTitle').innerHTML = '✏️ Modifier le courrier';
+            document.getElementById('submitBtn').innerHTML = '💾 Mettre à jour';
+            document.getElementById('formSubtitle').textContent = 'Modification en cours...';
+
+            updateExpediteurLabel();
+
+            // Scroller vers le formulaire
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            resetForm();
+        }
+
+        function deleteCourrier(id) {
+            if (!isAdmin) {
+                alert('⚠️ Vous n\'avez pas les droits pour supprimer.');
+                return;
+            }
+
+            if (!confirm('Supprimer définitivement ce courrier ?')) return;
+
+            courriers = courriers.filter(c => c.id !== id);
+            saveData();
+            applyFilterByTab();
+            calculerStatistiques();
+
+            if (currentSelectedId === id) {
+                currentSelectedId = null;
+                document.getElementById('apercuZone').style.display = 'none';
+                document.getElementById('detailsContent').innerHTML = `
+                    <div class="empty-state">
+                        <span class="emoji">📄</span>
+                        Sélectionnez un courrier pour voir les détails
+                    </div>
+                `;
+            }
+
+            alert('✅ Courrier supprimé');
+        }
+
+        // ================================================================
+        //  AFFICHAGE LISTE
+        // ================================================================
+
         function displayCourriers(list) {
             const container = document.getElementById('courriersList');
             const countSpan = document.getElementById('resultsCount');
 
-            countSpan.textContent = `${list.length} مراسلة (مراسلات)`;
+            countSpan.textContent = `${list.length} courrier(s)`;
 
             if (list.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <span class="emoji">📭</span>
-                        لا توجد مراسلات
+                        Aucun courrier
                     </div>
                 `;
                 return;
@@ -582,8 +1368,19 @@
                     '<span class="badge" style="background:#dc2626;">⚠️ عاجلة</span>' :
                     '';
 
+                // Actions (modifier/supprimer seulement pour admin)
+                let actionsHtml = '';
+                if (isAdmin) {
+                    actionsHtml = `
+                        <div class="actions" onclick="event.stopPropagation();">
+                            <button class="btn btn-sm btn-warning" onclick="editCourrier(${c.id})">✏️ Modifier</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCourrier(${c.id})">🗑 Supprimer</button>
+                        </div>
+                    `;
+                }
+
                 return `
-                    <div class="courrier-item ${isSelected ? 'selected' : ''}" onclick="selectCourrier('${c.id}')">
+                    <div class="courrier-item ${isSelected ? 'selected' : ''}" onclick="selectCourrier(${c.id})">
                         <div class="numero">
                             📄 ${escapeHtml(c.numero)}
                             <span class="badge ${langClass}">${langText}</span>
@@ -599,36 +1396,43 @@
                                 📄 Réf: <strong>${escapeHtml(c.pdfRef)}</strong>
                             </div>
                         ` : ''}
+                        ${actionsHtml}
                     </div>
                 `;
             }).join('');
         }
 
-        // ============================================================
+        // ================================================================
         //  SELECTION
-        // ============================================================
+        // ================================================================
+
         function selectCourrier(id) {
             currentSelectedId = id;
             const courrier = courriers.find(c => c.id === id);
 
-            const detailsEl = document.getElementById('detailsContent');
-
             if (!courrier) {
-                detailsEl.innerHTML = '<div class="empty-state"><span class="emoji">📄</span> Courrier introuvable</div>';
+                document.getElementById('apercuZone').style.display = 'none';
+                document.getElementById('detailsContent').innerHTML = `
+                    <div class="empty-state">
+                        <span class="emoji">📄</span>
+                        Courrier introuvable
+                    </div>
+                `;
                 return;
             }
 
-            const typeLabel = courrier.type === 'arrive' ? '📥 وارد' : '📤 صادر';
-            const expediteurLabel = courrier.type === 'arrive' ? '✉️ Expéditeur' : '✉️ Destinataire';
-
-            // Afficher la référence dans la zone d'aperçu
+            // Afficher la référence
             if (courrier.pdfRef) {
-                showDocumentReference(courrier.pdfRef + '.pdf');
+                showDocumentReference(courrier.pdfRef);
             } else {
                 document.getElementById('apercuZone').style.display = 'none';
             }
 
-            detailsEl.innerHTML = `
+            // Détails
+            const typeLabel = courrier.type === 'arrive' ? '📥 وارد' : '📤 صادر';
+            const expediteurLabel = courrier.type === 'arrive' ? '✉️ Expéditeur' : '✉️ Destinataire';
+
+            document.getElementById('detailsContent').innerHTML = `
                 <div class="details-content">
                     <p><strong>📝 Numéro :</strong> ${escapeHtml(courrier.numero)}</p>
                     <p><strong>📅 Date :</strong> ${formatDate(courrier.date)}</p>
@@ -638,8 +1442,9 @@
                     ${courrier.priorite ? `<p><strong>⚠️ Priorité :</strong> ${courrier.priorite}</p>` : ''}
                     ${courrier.contenu ? `<p><strong>📝 Contenu :</strong><br>${escapeHtml(courrier.contenu)}</p>` : ''}
                     ${courrier.pdfRef ? `
-                        <p><strong>📄 Référence document :</strong> <code style="background:#f3f4f6; padding:2px 8px; border-radius:4px;">${escapeHtml(courrier.pdfRef)}</code></p>
-                        <p style="font-size:12px; color:#6b7280;">
+                        <p><strong>📄 Référence document :</strong></p>
+                        <div class="doc-ref-code">${escapeHtml(courrier.pdfRef)}</div>
+                        <p style="font-size:12px; color:#6b7280; margin-top:5px;">
                             📁 Fichier : ${escapeHtml(courrier.pdfRef)}.pdf
                         </p>
                     ` : '<p><em>Aucun document attaché</em></p>'}
@@ -649,9 +1454,10 @@
             displayCourriers(currentDisplayList);
         }
 
-        // ============================================================
-        //  ONGLETS
-        // ============================================================
+        // ================================================================
+        //  ONGLETS ET TRI
+        // ================================================================
+
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -673,9 +1479,6 @@
             applySortAndDisplay();
         }
 
-        // ============================================================
-        //  TRI
-        // ============================================================
         function sortCourriers(list, sortType) {
             const sorted = [...list];
             switch (sortType) {
@@ -706,9 +1509,10 @@
             displayCourriers(sortedList);
         }
 
-        // ============================================================
+        // ================================================================
         //  RECHERCHE
-        // ============================================================
+        // ================================================================
+
         function searchCourriers() {
             const num = document.getElementById('searchNumero').value.toLowerCase();
             const date = document.getElementById('searchDate').value;
@@ -757,9 +1561,170 @@
             `;
         }
 
-        // ============================================================
+        // ================================================================
+        //  STATISTIQUES
+        // ================================================================
+
+        function calculerStatistiques() {
+            const debut = document.getElementById('statsDateDebut').value;
+            const fin = document.getElementById('statsDateFin').value;
+
+            let arrive = 0,
+                depart = 0;
+            let urgent = 0,
+                normal = 0;
+
+            courriers.forEach(c => {
+                if (debut && c.date < debut) return;
+                if (fin && c.date > fin) return;
+
+                if (c.type === 'arrive') arrive++;
+                else if (c.type === 'depart') depart++;
+
+                if (c.priorite === 'Urgente') urgent++;
+                else if (c.priorite === 'Normale') normal++;
+            });
+
+            const total = arrive + depart;
+
+            document.getElementById('statsResultat').innerHTML = `
+                <div class="stat-box"><div class="stat-number">${total}</div><div class="stat-label">Total</div></div>
+                <div class="stat-box"><div class="stat-number">${arrive}</div><div class="stat-label">📥 Arrivés</div></div>
+                <div class="stat-box"><div class="stat-number">${depart}</div><div class="stat-label">📤 Départs</div></div>
+                <div class="stat-box"><div class="stat-number">${urgent}</div><div class="stat-label">⚠️ Urgents</div></div>
+            `;
+        }
+
+        // ================================================================
+        //  EXPORT / IMPORT
+        // ================================================================
+
+        function exportCSV() {
+            if (!courriers.length) { alert('Aucune donnée à exporter'); return; }
+
+            let csv = 'Numéro;Date;Type;Expéditeur/Destinataire;Objet;Contenu;Priorité;Réf. PDF\n';
+            courriers.forEach(c => {
+                const typeLabel = c.type === 'arrive' ? 'Arrivé' : 'Départ';
+                csv += `"${c.numero}";"${c.date}";"${typeLabel}";"${c.expediteur}";"${c.objet}";"${c.contenu||''}";"${c.priorite||''}";"${c.pdfRef||''}"\n`;
+            });
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `courriers_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportExcel() {
+            if (!courriers.length) { alert('Aucune donnée à exporter'); return; }
+
+            const data = [
+                ['Numéro', 'Date', 'Type', 'Expéditeur/Destinataire', 'Objet', 'Contenu', 'Priorité', 'Réf. PDF']
+            ];
+            courriers.forEach(c => {
+                const typeLabel = c.type === 'arrive' ? 'Arrivé' : 'Départ';
+                data.push([c.numero, c.date, typeLabel, c.expediteur, c.objet, c.contenu || '', c.priorite || '',
+                    c.pdfRef || ''
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            ws['!cols'] = [{ wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 25 }, { wch: 30 }, { wch: 30 }, { wch: 12 },
+            { wch: 15 }];
+            XLSX.utils.book_append_sheet(wb, ws, 'Courriers');
+            XLSX.writeFile(wb, `courriers_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function importExcel(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+
+                    // Skip header row
+                    let count = 0;
+                    for (let i = 1; i < rows.length; i++) {
+                        const r = rows[i];
+                        if (r[0] && r[0].toString().trim()) {
+                            const type = r[2] && r[2].toString().includes('Départ') ? 'depart' : 'arrive';
+                            courriers.push({
+                                id: Date.now() + count + Math.random(),
+                                numero: r[0] ? String(r[0]).trim() : '',
+                                date: r[1] ? String(r[1]).trim() : '',
+                                type: type,
+                                expediteur: r[3] ? String(r[3]).trim() : '',
+                                objet: r[4] ? String(r[4]).trim() : '',
+                                contenu: r[5] ? String(r[5]).trim() : '',
+                                priorite: r[6] ? String(r[6]).trim() : 'Normale',
+                                pdfRef: r[7] ? String(r[7]).trim() : '',
+                                createdBy: currentUser,
+                                createdAt: new Date().toISOString()
+                            });
+                            count++;
+                        }
+                    }
+
+                    saveData();
+                    applyFilterByTab();
+                    calculerStatistiques();
+                    alert(`✅ ${count} courriers importés avec succès`);
+                } catch (err) {
+                    alert('❌ Erreur lors de l\'import : ' + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            input.value = '';
+        }
+
+        function imprimerListe() {
+            const list = currentDisplayList || courriers;
+            if (!list.length) { alert('Aucune donnée à imprimer'); return; }
+
+            let rows = '';
+            list.forEach(c => {
+                const typeLabel = c.type === 'arrive' ? 'Arrivé' : 'Départ';
+                rows += `<tr>
+                    <td>${c.numero||''}</td>
+                    <td>${c.date||''}</td>
+                    <td>${typeLabel}</td>
+                    <td>${c.expediteur||''}</td>
+                    <td>${c.objet||''}</td>
+                    <td>${c.pdfRef||''}</td>
+                </tr>`;
+            });
+
+            const win = window.open();
+            win.document.write(`
+                <html><head><title>Liste des courriers</title>
+                <style>
+                    body{font-family:Arial;padding:20px}
+                    table{border-collapse:collapse;width:100%;font-size:12px}
+                    th,td{border:1px solid #000;padding:5px;text-align:left}
+                    th{background:#1e3c72;color:white}
+                </style>
+                </head><body>
+                <h1>📮 Liste des courriers</h1>
+                <p>${new Date().toLocaleDateString()} | ${list.length} courrier(s)</p>
+                <table><thead><tr><th>Numéro</th><th>Date</th><th>Type</th><th>Expéditeur/Destinataire</th><th>Objet</th><th>Réf. PDF</th></tr></thead>
+                <tbody>${rows}</tbody></table>
+                </body></html>
+            `);
+            win.document.close();
+            win.print();
+        }
+
+        // ================================================================
         //  UTILITAIRES
-        // ============================================================
+        // ================================================================
+
         function formatDate(dateStr) {
             if (!dateStr) return '';
             const parts = dateStr.split('-');
@@ -777,10 +1742,21 @@
                 .replace(/'/g, '&#39;');
         }
 
-        // ============================================================
+        // ================================================================
         //  INITIALISATION
-        // ============================================================
-        loadData();
+        // ================================================================
+
+        // Initialiser la date du jour
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Vérifier la session
+        if (!checkSession()) {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appContent').classList.add('hidden');
+        } else {
+            // Calculer les stats au chargement
+            setTimeout(calculerStatistiques, 500);
+        }
     </script>
 </body>
 </html>
