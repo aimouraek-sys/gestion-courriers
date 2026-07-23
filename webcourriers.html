@@ -6,6 +6,7 @@
     <title>📮 إدارة المراسلات - وارد / صادر</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
+        /* ====== STYLES (version simplifiée avec corrections) ====== */
         * {
             margin: 0;
             padding: 0;
@@ -24,6 +25,7 @@
             margin: 0 auto;
         }
 
+        /* ====== ÉCRAN DE CONNEXION ====== */
         .login-screen {
             position: fixed;
             top: 0;
@@ -52,25 +54,21 @@
             font-size: 28px;
             margin-bottom: 5px;
         }
-
         .login-box .subtitle {
             text-align: center;
             color: #666;
             margin-bottom: 25px;
             font-size: 14px;
         }
-
         .login-box .form-group {
             margin-bottom: 15px;
         }
-
         .login-box .form-group label {
             display: block;
             font-weight: 600;
             margin-bottom: 5px;
             color: #333;
         }
-
         .login-box .form-group input {
             width: 100%;
             padding: 12px;
@@ -79,12 +77,10 @@
             font-size: 15px;
             transition: all 0.3s;
         }
-
         .login-box .form-group input:focus {
             outline: none;
             border-color: #1e3c72;
         }
-
         .login-box .btn-login {
             width: 100%;
             padding: 14px;
@@ -97,12 +93,10 @@
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
         }
-
         .login-box .btn-login:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4);
         }
-
         .login-box .error-msg {
             background: #fee2e2;
             color: #dc2626;
@@ -112,7 +106,6 @@
             text-align: center;
             display: none;
         }
-
         .login-box .footer-links {
             text-align: center;
             margin-top: 15px;
@@ -124,6 +117,7 @@
             display: none !important;
         }
 
+        /* ====== HEADER ====== */
         .header {
             background: white;
             border-radius: 15px;
@@ -132,7 +126,6 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
-
         .header .user-bar {
             display: flex;
             justify-content: space-between;
@@ -143,13 +136,11 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-
         .header .user-bar .user-info-display {
             font-weight: 600;
             color: #1e3c72;
             font-size: 14px;
         }
-
         .header .user-bar .user-role {
             font-size: 12px;
             padding: 2px 10px;
@@ -158,12 +149,10 @@
             color: #065f46;
             margin-right: 8px;
         }
-
         .header .user-bar .user-role.admin {
             background: #fef3c7;
             color: #92400e;
         }
-
         .header .user-bar .btn-logout {
             padding: 8px 16px;
             border: none;
@@ -175,11 +164,9 @@
             transition: all 0.3s;
             font-size: 13px;
         }
-
         .header .user-bar .btn-logout:hover {
             background: #dc2626;
         }
-
         .header .user-bar .btn-admin {
             padding: 8px 16px;
             border: none;
@@ -191,58 +178,63 @@
             transition: all 0.3s;
             font-size: 13px;
         }
-
         .header .user-bar .btn-admin:hover {
             background: #7c3aed;
         }
-
         .header h1 {
             color: #1e3c72;
             font-size: 28px;
         }
-
         .header p {
             color: #666;
             margin-top: 5px;
         }
+        .header .status {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .header .status .online {
+            color: #10b981;
+        }
+        .header .status .offline {
+            color: #ef4444;
+        }
 
+        /* ====== GRILLE ====== */
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
-
         .card {
             background: white;
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
-
         .card h2 {
             color: #1e3c72;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #eee;
         }
-
         .card .subtitle-card {
             font-size: 13px;
             color: #6b7280;
             margin-bottom: 15px;
         }
 
+        /* ====== FORMULAIRE ====== */
         .form-group {
             margin-bottom: 15px;
         }
-
         .form-group label {
             display: block;
             font-weight: 600;
             margin-bottom: 5px;
             color: #333;
         }
-
         .form-group input,
         .form-group select,
         .form-group textarea {
@@ -254,30 +246,25 @@
             transition: all 0.3s;
             font-family: inherit;
         }
-
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
             border-color: #1e3c72;
         }
-
         .form-group textarea {
             resize: vertical;
             min-height: 60px;
         }
-
         .form-row {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
         }
-
         .form-row .form-group {
             flex: 1;
             min-width: 180px;
         }
-
         .form-group.type-first {
             background: #f0f4ff;
             padding: 12px 15px;
@@ -285,18 +272,17 @@
             border: 2px solid #1e3c72;
             margin-bottom: 20px;
         }
-
         .form-group.type-first label {
             color: #1e3c72;
             font-size: 16px;
         }
-
         .form-group.type-first select {
             border-color: #1e3c72;
             font-weight: 600;
             font-size: 16px;
         }
 
+        /* ====== SECTION CHARGEMENT PDF ====== */
         .pdf-upload-section {
             background: #f0fdf4;
             padding: 15px;
@@ -304,21 +290,18 @@
             border: 2px dashed #10b981;
             margin-bottom: 20px;
         }
-
         .pdf-upload-section label {
             font-weight: 600;
             color: #065f46;
             display: block;
             margin-bottom: 8px;
         }
-
         .pdf-upload-section .upload-row {
             display: flex;
             gap: 10px;
             align-items: center;
             flex-wrap: wrap;
         }
-
         .pdf-upload-section .upload-row input[type="file"] {
             flex: 1;
             padding: 8px;
@@ -327,13 +310,11 @@
             font-size: 13px;
             min-width: 150px;
         }
-
         .pdf-upload-section .upload-row .btn {
             white-space: nowrap;
             padding: 8px 16px;
             font-size: 13px;
         }
-
         .pdf-upload-section .file-info {
             font-size: 12px;
             color: #065f46;
@@ -341,24 +322,112 @@
             display: none;
             text-align: left;
         }
-
         .pdf-upload-section .hint {
             font-size: 11px;
             color: #6b7280;
             margin-top: 5px;
             text-align: left;
         }
-
         .pdf-upload-section .hint strong {
             color: #065f46;
         }
-
         .pdf-upload-section .locked-info {
             font-size: 11px;
             color: #6b7280;
             margin-top: 3px;
         }
 
+        /* ====== ZONE APERÇU PDF (EN BAS) ====== */
+        .apercu-pdf {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            display: none;
+        }
+        .apercu-pdf.visible {
+            display: block;
+        }
+        .pdf-viewer {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+        }
+        .pdf-list-preview {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            min-height: 40px;
+        }
+        .pdf-list-preview .pdf-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            padding: 4px 12px 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            margin: 2px;
+        }
+        .pdf-list-preview .pdf-item .pdf-name {
+            color: #1e3c72;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        .pdf-list-preview .pdf-item .pdf-size {
+            font-size: 11px;
+            color: #6b7280;
+        }
+        .pdf-list-preview .pdf-item .btn-view-pdf {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .pdf-list-preview .pdf-item .btn-view-pdf:hover {
+            background: #2563eb;
+        }
+        .pdf-list-preview .pdf-item .btn-delete-pdf {
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .pdf-list-preview .pdf-item .btn-delete-pdf:hover {
+            background: #b91c1c;
+        }
+        .empty-pdf-message {
+            color: #999;
+            padding: 10px;
+            font-size: 13px;
+        }
+        .doc-instruction {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: #92400e;
+        }
+        .doc-instruction strong {
+            color: #78350f;
+        }
+
+        /* ====== BOUTONS ====== */
         .btn {
             padding: 12px 24px;
             border: none;
@@ -368,96 +437,76 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-
         .btn-primary {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
         }
-
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4);
         }
-
         .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
-
         .btn-secondary {
             background: #6b7280;
             color: white;
         }
-
         .btn-secondary:hover {
             background: #4b5563;
         }
-
         .btn-danger {
             background: #dc2626;
             color: white;
         }
-
         .btn-danger:hover {
             background: #b91c1c;
         }
-
         .btn-success {
             background: #10b981;
             color: white;
         }
-
         .btn-success:hover {
             background: #059669;
         }
-
         .btn-warning {
             background: #f59e0b;
             color: white;
         }
-
         .btn-warning:hover {
             background: #d97706;
         }
-
         .btn-sm {
             padding: 5px 10px;
             font-size: 12px;
         }
-
-        .btn-block {
-            width: 100%;
-        }
-
         .btn-group {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             margin-top: 15px;
         }
-
         .btn-group .btn {
             flex: 1;
             min-width: 100px;
         }
-
         .btn-import {
             background: #8b5cf6;
             color: white;
         }
-
         .btn-import:hover {
             background: #7c3aed;
         }
 
+        /* ====== LISTE ====== */
         .search-filters {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
             margin-bottom: 15px;
         }
-
         .search-filters input,
         .search-filters select {
             padding: 10px;
@@ -466,13 +515,11 @@
             font-size: 14px;
             width: 100%;
         }
-
         .search-filters input:focus,
         .search-filters select:focus {
             outline: none;
             border-color: #1e3c72;
         }
-
         .sort-section {
             display: flex;
             align-items: center;
@@ -483,19 +530,16 @@
             border-radius: 8px;
             flex-wrap: wrap;
         }
-
         .sort-section label {
             font-weight: 600;
             color: #333;
         }
-
         .sort-section select {
             padding: 8px;
             border-radius: 6px;
             border: 1px solid #d1d5db;
             background: white;
         }
-
         .tabs {
             display: flex;
             gap: 5px;
@@ -504,7 +548,6 @@
             border-radius: 10px;
             padding: 4px;
         }
-
         .tab-btn {
             flex: 1;
             padding: 10px 20px;
@@ -517,21 +560,17 @@
             background: transparent;
             color: #64748b;
         }
-
         .tab-btn:hover {
             background: rgba(255, 255, 255, 0.5);
         }
-
         .tab-btn.active {
             background: white;
             color: #1e3c72;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-
         .tab-btn.arrive {
             border-right: 3px solid #10b981;
         }
-
         .tab-btn.depart {
             border-right: 3px solid #3b82f6;
         }
@@ -540,7 +579,6 @@
             max-height: 450px;
             overflow-y: auto;
         }
-
         .courrier-item {
             background: #f9fafb;
             border: 1px solid #e5e7eb;
@@ -550,42 +588,35 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-
         .courrier-item:hover {
             background: #f3f4f6;
             transform: translateX(5px);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-
         .courrier-item.selected {
             background: #e0e7ff;
             border: 2px solid #1e3c72;
         }
-
         .courrier-item .numero {
             font-weight: bold;
             color: #1e3c72;
             font-size: 16px;
         }
-
         .courrier-item .expediteur {
             font-weight: 600;
             color: #333;
             margin-top: 5px;
         }
-
         .courrier-item .objet {
             color: #666;
             font-size: 14px;
             margin-top: 5px;
         }
-
         .courrier-item .date {
             color: #999;
             font-size: 12px;
             margin-top: 5px;
         }
-
         .courrier-item .doc-ref {
             margin-top: 8px;
             padding: 6px 12px;
@@ -594,6 +625,20 @@
             font-size: 13px;
             color: #1e40af;
             display: inline-block;
+        }
+        .courrier-item .pdf-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            background: #fef3c7;
+            color: #92400e;
+            margin-left: 8px;
+        }
+        .courrier-item .pdf-badge.loaded {
+            background: #d1fae5;
+            color: #065f46;
         }
 
         .badge {
@@ -604,22 +649,18 @@
             font-weight: 600;
             margin-right: 8px;
         }
-
         .badge-arabe {
             background: #10b981;
             color: white;
         }
-
         .badge-francais {
             background: #3b82f6;
             color: white;
         }
-
         .badge-pdf {
             background: #f59e0b;
             color: white;
         }
-
         .type-badge {
             display: inline-block;
             padding: 2px 10px;
@@ -628,35 +669,30 @@
             font-weight: 600;
             margin-right: 8px;
         }
-
         .type-arrive {
             background: #d1fae5;
             color: #065f46;
         }
-
         .type-depart {
             background: #dbeafe;
             color: #1e40af;
         }
-
         .courrier-item .actions {
             margin-top: 10px;
         }
 
+        /* ====== DÉTAILS ====== */
         .details-content {
             background: #f8fafc;
             padding: 15px;
             border-radius: 10px;
         }
-
         .details-content p {
             margin-bottom: 8px;
         }
-
         .details-content strong {
             color: #1e3c72;
         }
-
         .details-content .doc-ref-code {
             background: #e0e7ff;
             padding: 8px 12px;
@@ -673,20 +709,19 @@
             padding: 40px;
             color: #999;
         }
-
         .empty-state .emoji {
             font-size: 48px;
             display: block;
             margin-bottom: 10px;
         }
 
+        /* ====== STATISTIQUES ====== */
         .stats-container {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
             justify-content: center;
         }
-
         .stat-box {
             background: #f8f9fa;
             border-radius: 10px;
@@ -695,18 +730,15 @@
             min-width: 80px;
             flex: 1;
         }
-
         .stat-number {
             font-size: 28px;
             font-weight: bold;
             color: #1e3c72;
         }
-
         .stat-label {
             font-size: 12px;
             color: #666;
         }
-
         .stat-filters {
             display: flex;
             gap: 10px;
@@ -714,24 +746,9 @@
             flex-wrap: wrap;
             align-items: flex-end;
         }
-
         .stat-filters .form-group {
             margin-bottom: 0;
             min-width: 120px;
-        }
-
-        .doc-instruction {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-            font-size: 13px;
-            color: #92400e;
-        }
-
-        .doc-instruction strong {
-            color: #78350f;
         }
 
         .edit-mode-indicator {
@@ -743,21 +760,6 @@
             margin-bottom: 15px;
             font-weight: 600;
             color: #333;
-        }
-
-        .apercu-pdf {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8fafc;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .pdf-viewer {
-            width: 100%;
-            height: 400px;
-            border: none;
-            border-radius: 8px;
         }
 
         @media (max-width: 768px) {
@@ -793,6 +795,9 @@
             }
             .pdf-upload-section .upload-row input[type="file"] {
                 width: 100%;
+            }
+            .pdf-viewer {
+                height: 250px;
             }
         }
 
@@ -844,6 +849,7 @@
     ================================================================ -->
     <div id="appContent" class="container hidden">
 
+        <!-- HEADER -->
         <div class="header">
             <div class="user-bar">
                 <div class="user-info-display">
@@ -857,6 +863,7 @@
             </div>
             <h1>📮 إدارة المراسلات - وارد / صادر</h1>
             <p>تتبع مراسلاتك الواردة والصادرة</p>
+            <div class="status" id="dbStatus">📁 قاعدة البيانات: <span class="online">✅ متصلة</span></div>
         </div>
 
         <div class="grid">
@@ -874,7 +881,7 @@
                     <div class="pdf-upload-section">
                         <label>📂 تحميل ملف PDF</label>
                         <div class="upload-row">
-                            <input type="file" id="pdfFileInput" accept=".pdf">
+                            <input type="file" id="pdfFileInput" accept=".pdf" multiple>
                             <button type="button" class="btn btn-sm btn-success" onclick="chargerPDF()">📥 تحميل</button>
                             <button type="button" class="btn btn-sm btn-secondary" onclick="deverrouillerChamps()">🔓 فتح التعديل</button>
                         </div>
@@ -1002,11 +1009,16 @@
             </div>
         </div>
 
-        <!-- ====== ZONE D'APERÇU PDF ====== -->
-        <div id="apercuZone" class="card" style="margin-top:20px; display:none;">
-            <h3>📄 مرجع المستند</h3>
-            <div id="pdfListPreview" style="margin-bottom:10px;"></div>
-            <div class="doc-instruction">
+        <!-- ====== ZONE D'APERÇU PDF (EN BAS) ====== -->
+        <div id="apercuZone" class="apercu-pdf">
+            <h3>📄 المستندات المرفقة</h3>
+            <div id="pdfListPreview" class="pdf-list-preview">
+                <div class="empty-pdf-message">📭 لا توجد مستندات مرفقة</div>
+            </div>
+            <div id="pdfViewerContainer" style="margin-top:10px;">
+                <iframe id="pdfViewer" class="pdf-viewer" src=""></iframe>
+            </div>
+            <div class="doc-instruction" style="margin-top:10px;">
                 📁 <strong>تعليمات :</strong><br>
                 1️⃣ انسخ المرجع أعلاه<br>
                 2️⃣ افتح المجلد <strong>C:\pdfs\</strong> أو المجلد المشترك<br>
@@ -1016,10 +1028,403 @@
         </div>
     </div>
 
-    <!-- ================================================================
-    SCRIPTS
-    ================================================================ -->
     <script>
+        // ================================================================
+        //  💾 INDEXEDDB - GESTION DES PDF
+        // ================================================================
+
+        const DB_NAME = 'CourriersDB';
+        const STORE_NAME = 'pdfs';
+        const DB_VERSION = 1;
+
+        let db = null;
+
+        // Ouvrir la base de données IndexedDB
+        function ouvrirDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onerror = function(event) {
+                    console.error('❌ Erreur IndexedDB:', event.target.error);
+                    reject(event.target.error);
+                };
+
+                request.onsuccess = function(event) {
+                    db = event.target.result;
+                    console.log('✅ IndexedDB ouverte avec succès');
+                    document.getElementById('dbStatus').innerHTML =
+                        '📁 قاعدة البيانات: <span class="online">✅ متصلة</span>';
+                    resolve(db);
+                };
+
+                request.onupgradeneeded = function(event) {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                        store.createIndex('ref', 'ref', { unique: false });
+                        console.log('✅ Store "pdfs" créé');
+                    }
+                };
+            });
+        }
+
+        // Sauvegarder un PDF dans IndexedDB
+        function sauvegarderPDF(id, ref, nom, type, blob) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject(new Error('Base de données non ouverte'));
+                    return;
+                }
+
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+
+                const data = {
+                    id: id,
+                    ref: ref,
+                    nom: nom,
+                    type: type,
+                    blob: blob,
+                    taille: blob.size,
+                    dateAjout: new Date().toISOString()
+                };
+
+                const request = store.put(data);
+
+                request.onsuccess = function() {
+                    console.log('✅ PDF sauvegardé dans IndexedDB:', nom);
+                    // 🔄 Recharger l'affichage des PDF
+                    chargerPDFsCourant();
+                    resolve(request.result);
+                };
+
+                request.onerror = function() {
+                    reject(request.error);
+                };
+            });
+        }
+
+        // Récupérer les PDF par référence
+        function recupererPDFParRef(ref) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject(new Error('Base de données non ouverte'));
+                    return;
+                }
+
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const index = store.index('ref');
+                const request = index.getAll(ref);
+
+                request.onsuccess = function() {
+                    resolve(request.result);
+                };
+
+                request.onerror = function() {
+                    reject(request.error);
+                };
+            });
+        }
+
+        // Supprimer un PDF
+        function supprimerPDF(id) {
+            return new Promise((resolve, reject) => {
+                if (!db) {
+                    reject(new Error('Base de données non ouverte'));
+                    return;
+                }
+
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.delete(id);
+
+                request.onsuccess = function() {
+                    console.log('✅ PDF supprimé de IndexedDB:', id);
+                    resolve();
+                };
+
+                request.onerror = function() {
+                    reject(request.error);
+                };
+            });
+        }
+
+        // Supprimer tous les PDF d'une référence
+        function supprimerPDFParRef(ref) {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const pdfs = await recupererPDFParRef(ref);
+                    const promises = pdfs.map(p => supprimerPDF(p.id));
+                    await Promise.all(promises);
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }
+
+        // Générer un ID unique
+        function genererIdPDF() {
+            return 'pdf_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        }
+
+        // ================================================================
+        //  📂 CHARGEMENT PDF
+        // ================================================================
+
+        let pdfFilesSelected = [];
+
+        document.getElementById('pdfFileInput').addEventListener('change', function() {
+            const files = this.files;
+            if (files.length > 0) {
+                pdfFilesSelected = Array.from(files);
+                afficherInfosPDF(pdfFilesSelected);
+            } else {
+                pdfFilesSelected = [];
+                document.getElementById('pdfFileInfo').style.display = 'none';
+            }
+        });
+
+        function afficherInfosPDF(files) {
+            const infoDiv = document.getElementById('pdfFileInfo');
+            infoDiv.style.display = 'block';
+            infoDiv.style.color = '#065f46';
+            infoDiv.innerHTML = `
+                ✅ <span style="font-weight:600;">${files.length} fichier(s) sélectionné(s) :</span><br>
+                ${files.map(f => `📎 ${f.name} (${(f.size / 1024).toFixed(1)} KB)`).join('<br>')}
+            `;
+
+            if (files.length === 1) {
+                extraireDonneesNomFichier(files[0].name);
+            }
+        }
+
+        function chargerPDF() {
+            document.getElementById('pdfFileInput').click();
+        }
+
+        function extraireDonneesNomFichier(nomFichier) {
+            const nomSansExt = nomFichier.replace(/\.pdf$/i, '');
+            const parts = nomSansExt.split('-');
+
+            if (parts.length !== 4) {
+                const infoDiv = document.getElementById('pdfFileInfo');
+                infoDiv.style.display = 'block';
+                infoDiv.style.color = '#dc2626';
+                infoDiv.innerHTML =
+                    '⚠️ <span style="color:#dc2626;">صيغة الملف غير صالحة.</span><br>الصيغة المطلوبة : <strong>001-15-01-2024.pdf</strong>';
+                return;
+            }
+
+            const seqNum = parts[0];
+            const jour = parts[1];
+            const mois = parts[2];
+            const annee = parts[3];
+
+            if (seqNum.length < 1 || jour.length !== 2 || mois.length !== 2 || annee.length !== 4) {
+                const infoDiv = document.getElementById('pdfFileInfo');
+                infoDiv.style.display = 'block';
+                infoDiv.style.color = '#dc2626';
+                infoDiv.innerHTML =
+                    '⚠️ <span style="color:#dc2626;">صيغة الملف غير صالحة.</span><br>الصيغة المطلوبة : <strong>001-15-01-2024.pdf</strong>';
+                return;
+            }
+
+            const numeroComplet = annee + '-' + seqNum;
+
+            document.getElementById('numero').value = numeroComplet;
+            document.getElementById('date').value = annee + '-' + mois + '-' + jour;
+
+            const ref = seqNum + '-' + jour + '-' + mois + '-' + annee;
+            document.getElementById('pdfRef').value = ref;
+
+            document.getElementById('numero').readOnly = true;
+            document.getElementById('date').readOnly = true;
+            document.getElementById('pdfRef').readOnly = true;
+
+            document.getElementById('lockedInfo').innerHTML = '🔒 الحقول مقفلة (غير قابلة للتعديل) - اضغط "فتح التعديل" لتعديلها';
+
+            const infoDiv = document.getElementById('pdfFileInfo');
+            infoDiv.style.display = 'block';
+            infoDiv.style.color = '#065f46';
+            infoDiv.innerHTML = `
+                ✅ <span style="font-weight:600;">تم استخراج البيانات :</span><br>
+                📝 الرقم : <strong>${numeroComplet}</strong><br>
+                📅 التاريخ : <strong>${jour}/${mois}/${annee}</strong><br>
+                📄 المرجع : <strong>${ref}</strong><br>
+                <span style="font-size:11px; color:#6b7280;">📁 ${nomFichier}</span><br>
+                <span style="font-size:11px; color:#6b7280;">🔒 الحقول مقفلة للتعديل</span>
+            `;
+
+            ['numero', 'date', 'pdfRef'].forEach(id => {
+                const el = document.getElementById(id);
+                el.style.borderColor = '#10b981';
+                el.style.backgroundColor = '#f0fdf4';
+                setTimeout(() => {
+                    el.style.borderColor = '';
+                    el.style.backgroundColor = '';
+                }, 2000);
+            });
+
+            updateExpediteurLabel();
+        }
+
+        function deverrouillerChamps() {
+            document.getElementById('numero').readOnly = false;
+            document.getElementById('date').readOnly = false;
+            document.getElementById('pdfRef').readOnly = false;
+            document.getElementById('lockedInfo').innerHTML = '🔓 الحقول مفتوحة للتعديل';
+            const infoDiv = document.getElementById('pdfFileInfo');
+            if (infoDiv.style.display !== 'none') {
+                infoDiv.innerHTML += '<br>🔓 <span style="color:#6b7280;">تم فتح الحقول للتعديل</span>';
+            }
+        }
+
+        // ================================================================
+        //  🔄 GÉNÉRATION AUTOMATIQUE DE LA RÉFÉRENCE PDF
+        // ================================================================
+
+        function genererReference() {
+            const numero = document.getElementById('numero').value.trim();
+            const date = document.getElementById('date').value;
+
+            if (!numero || !date) {
+                alert('⚠️ Veuillez d\'abord saisir le numéro et la date du courrier.');
+                return;
+            }
+
+            const numParts = numero.split('-');
+            const seqNum = numParts[numParts.length - 1];
+            const dateParts = date.split('-');
+            const dateRef = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
+            const ref = seqNum + '-' + dateRef;
+
+            document.getElementById('pdfRef').value = ref;
+
+            const input = document.getElementById('pdfRef');
+            input.style.borderColor = '#10b981';
+            input.style.backgroundColor = '#f0fdf4';
+            setTimeout(() => {
+                input.style.borderColor = '';
+                input.style.backgroundColor = '';
+            }, 1500);
+        }
+
+        document.getElementById('numero').addEventListener('change', function() {
+            if (this.value && document.getElementById('date').value) { genererReference(); }
+        });
+
+        document.getElementById('date').addEventListener('change', function() {
+            if (this.value && document.getElementById('numero').value) { genererReference(); }
+        });
+
+        // ================================================================
+        //  📄 AFFICHAGE DES PDF
+        // ================================================================
+
+        // Variable pour stocker la référence du courrier actuel
+        let currentPdfRef = null;
+
+        async function afficherPDFs(ref) {
+            const previewDiv = document.getElementById('apercuZone');
+            const listPreview = document.getElementById('pdfListPreview');
+            const viewer = document.getElementById('pdfViewer');
+
+            currentPdfRef = ref;
+
+            console.log('🔍 Recherche PDF pour ref:', ref);
+
+            if (!ref) {
+                previewDiv.style.display = 'none';
+                listPreview.innerHTML = '<div class="empty-pdf-message">📭 لا توجد مستندات مرفقة</div>';
+                return;
+            }
+
+            try {
+                const pdfs = await recupererPDFParRef(ref);
+                console.log('📄 PDF trouvés :', pdfs);
+
+                if (pdfs.length === 0) {
+                    previewDiv.style.display = 'none';
+                    listPreview.innerHTML = '<div class="empty-pdf-message">📭 لا توجد مستندات مرفقة لهذا المراسلة</div>';
+                    return;
+                }
+
+                previewDiv.style.display = 'block';
+                previewDiv.className = 'apercu-pdf visible';
+
+                listPreview.innerHTML = pdfs.map(p => `
+                    <div class="pdf-item">
+                        <span class="pdf-name">📎 ${escapeHtml(p.nom)}</span>
+                        <span class="pdf-size">(${(p.taille / 1024).toFixed(1)} KB)</span>
+                        <button class="btn-view-pdf" onclick="visualiserPDF('${p.id}')">👁️</button>
+                        <button class="btn-delete-pdf" onclick="supprimerPDFUI('${p.id}', '${ref}')">✕</button>
+                    </div>
+                `).join('');
+
+                if (pdfs.length > 0) {
+                    visualiserPDF(pdfs[0].id);
+                }
+            } catch (error) {
+                console.error('❌ Erreur affichage PDF:', error);
+                previewDiv.style.display = 'none';
+            }
+        }
+
+        // Fonction pour recharger les PDF du courrier actuellement sélectionné
+        function chargerPDFsCourant() {
+            if (currentPdfRef) {
+                afficherPDFs(currentPdfRef);
+            }
+        }
+
+        function visualiserPDF(id) {
+            const viewer = document.getElementById('pdfViewer');
+
+            if (!db) {
+                alert('❌ Base de données non disponible');
+                return;
+            }
+
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.get(id);
+
+            request.onsuccess = function() {
+                const pdf = request.result;
+                if (pdf && pdf.blob) {
+                    if (viewer._currentUrl) {
+                        URL.revokeObjectURL(viewer._currentUrl);
+                    }
+                    const url = URL.createObjectURL(pdf.blob);
+                    viewer._currentUrl = url;
+                    viewer.src = url;
+                    document.getElementById('apercuZone').style.display = 'block';
+                    document.getElementById('apercuZone').className = 'apercu-pdf visible';
+                    console.log('✅ PDF affiché :', pdf.nom);
+                } else {
+                    alert('❌ PDF introuvable');
+                }
+            };
+
+            request.onerror = function() {
+                alert('❌ Erreur lors du chargement du PDF');
+            };
+        }
+
+        async function supprimerPDFUI(id, ref) {
+            if (!confirm('هل أنت متأكد من حذف هذا الملف PDF نهائياً؟')) return;
+
+            try {
+                await supprimerPDF(id);
+                await afficherPDFs(ref);
+                alert('✅ PDF supprimé avec succès');
+            } catch (error) {
+                alert('❌ Erreur lors de la suppression: ' + error.message);
+            }
+        }
+
         // ================================================================
         //  🔐 AUTHENTIFICATION
         // ================================================================
@@ -1077,7 +1482,7 @@
 
             localStorage.setItem('courriers_session', JSON.stringify({ user: username, role: users[username].role }));
 
-            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContent').classList.remove('hidden');
             updateUserDisplay();
 
@@ -1091,7 +1496,7 @@
             currentUser = null;
             currentUserData = null;
             isAdmin = false;
-            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('appContent').classList.add('hidden');
             document.getElementById('loginPassword').value = '';
             document.getElementById('loginError').style.display = 'none';
@@ -1126,7 +1531,7 @@
                         currentUser = data.user;
                         currentUserData = users[data.user];
                         isAdmin = data.role === 'admin';
-                        document.getElementById('loginScreen').classList.add('hidden');
+                        document.getElementById('loginScreen').style.display = 'none';
                         document.getElementById('appContent').classList.remove('hidden');
                         updateUserDisplay();
                         if (isAdmin) { document.getElementById('adminBtn').style.display = 'inline-block'; }
@@ -1136,184 +1541,6 @@
                 } catch (e) {}
             }
             return false;
-        }
-
-        // ================================================================
-        //  📂 CHARGEMENT PDF - EXTRACTION DES DONNÉES
-        //  Format : NNN-JJ-MM-AAAA.pdf
-        // ================================================================
-
-        let pdfFileSelected = null;
-
-        document.getElementById('pdfFileInput').addEventListener('change', function() {
-            const file = this.files[0];
-            if (file && file.name.endsWith('.pdf')) {
-                pdfFileSelected = file;
-                extraireDonneesNomFichier(file.name);
-            } else {
-                pdfFileSelected = null;
-                document.getElementById('pdfFileInfo').style.display = 'none';
-                document.getElementById('pdfFileInfo').innerHTML = '';
-            }
-        });
-
-        function chargerPDF() {
-            document.getElementById('pdfFileInput').click();
-        }
-
-        function extraireDonneesNomFichier(nomFichier) {
-            const nomSansExt = nomFichier.replace(/\.pdf$/i, '');
-            const parts = nomSansExt.split('-');
-
-            if (parts.length !== 4) {
-                const infoDiv = document.getElementById('pdfFileInfo');
-                infoDiv.style.display = 'block';
-                infoDiv.style.color = '#dc2626';
-                infoDiv.style.textAlign = 'left';
-                infoDiv.innerHTML = '⚠️ <span style="color:#dc2626;">صيغة الملف غير صالحة.</span><br>الصيغة المطلوبة : <strong>001-15-01-2024.pdf</strong>';
-                return;
-            }
-
-            const seqNum = parts[0];
-            const jour = parts[1];
-            const mois = parts[2];
-            const annee = parts[3];
-
-            if (seqNum.length < 1 || jour.length !== 2 || mois.length !== 2 || annee.length !== 4) {
-                const infoDiv = document.getElementById('pdfFileInfo');
-                infoDiv.style.display = 'block';
-                infoDiv.style.color = '#dc2626';
-                infoDiv.style.textAlign = 'left';
-                infoDiv.innerHTML = '⚠️ <span style="color:#dc2626;">صيغة الملف غير صالحة.</span><br>الصيغة المطلوبة : <strong>001-15-01-2024.pdf</strong>';
-                return;
-            }
-
-            const numeroComplet = annee + '-' + seqNum;
-
-            document.getElementById('numero').value = numeroComplet;
-            document.getElementById('date').value = annee + '-' + mois + '-' + jour;
-
-            const ref = seqNum + '-' + jour + '-' + mois + '-' + annee;
-            document.getElementById('pdfRef').value = ref;
-
-            document.getElementById('numero').readOnly = true;
-            document.getElementById('date').readOnly = true;
-            document.getElementById('pdfRef').readOnly = true;
-
-            document.getElementById('lockedInfo').innerHTML = '🔒 الحقول مقفلة (غير قابلة للتعديل) - اضغط "فتح التعديل" لتعديلها';
-
-            const infoDiv = document.getElementById('pdfFileInfo');
-            infoDiv.style.display = 'block';
-            infoDiv.style.color = '#065f46';
-            infoDiv.style.textAlign = 'left';
-            infoDiv.innerHTML = `
-                ✅ <span style="font-weight:600;">تم استخراج البيانات :</span><br>
-                📝 الرقم : <strong>${numeroComplet}</strong><br>
-                📅 التاريخ : <strong>${jour}/${mois}/${annee}</strong><br>
-                📄 المرجع : <strong>${ref}</strong><br>
-                <span style="font-size:11px; color:#6b7280;">📁 ${nomFichier}</span><br>
-                <span style="font-size:11px; color:#6b7280;">🔒 الحقول مقفلة للتعديل</span>
-            `;
-
-            ['numero', 'date', 'pdfRef'].forEach(id => {
-                const el = document.getElementById(id);
-                el.style.borderColor = '#10b981';
-                el.style.backgroundColor = '#f0fdf4';
-                setTimeout(() => { el.style.borderColor = '';
-                    el.style.backgroundColor = ''; }, 2000);
-            });
-
-            updateExpediteurLabel();
-        }
-
-        function deverrouillerChamps() {
-            document.getElementById('numero').readOnly = false;
-            document.getElementById('date').readOnly = false;
-            document.getElementById('pdfRef').readOnly = false;
-            document.getElementById('lockedInfo').innerHTML = '🔓 الحقول مفتوحة للتعديل';
-            const infoDiv = document.getElementById('pdfFileInfo');
-            if (infoDiv.style.display !== 'none') {
-                infoDiv.innerHTML += '<br>🔓 <span style="color:#6b7280;">تم فتح الحقول للتعديل</span>';
-            }
-        }
-
-        // ================================================================
-        //  🔄 GÉNÉRATION AUTOMATIQUE DE LA RÉFÉRENCE PDF
-        // ================================================================
-
-        function genererReference() {
-            const numero = document.getElementById('numero').value.trim();
-            const date = document.getElementById('date').value;
-
-            if (!numero || !date) {
-                alert('⚠️ Veuillez d\'abord saisir le numéro et la date du courrier.');
-                return;
-            }
-
-            const numParts = numero.split('-');
-            const seqNum = numParts[numParts.length - 1];
-            const dateParts = date.split('-');
-            const dateRef = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
-            const ref = seqNum + '-' + dateRef;
-
-            document.getElementById('pdfRef').value = ref;
-
-            const input = document.getElementById('pdfRef');
-            input.style.borderColor = '#10b981';
-            input.style.backgroundColor = '#f0fdf4';
-            setTimeout(() => { input.style.borderColor = '';
-                input.style.backgroundColor = ''; }, 1500);
-        }
-
-        document.getElementById('numero').addEventListener('change', function() {
-            if (this.value && document.getElementById('date').value) { genererReference(); }
-        });
-
-        document.getElementById('date').addEventListener('change', function() {
-            if (this.value && document.getElementById('numero').value) { genererReference(); }
-        });
-
-        // ================================================================
-        //  📄 AFFICHAGE DE LA RÉFÉRENCE
-        // ================================================================
-
-        function showDocumentReference(pdfRef) {
-            const previewDiv = document.getElementById('apercuZone');
-            const listPreview = document.getElementById('pdfListPreview');
-
-            if (!pdfRef) {
-                previewDiv.style.display = 'none';
-                return;
-            }
-
-            listPreview.innerHTML = `
-                <div style="background:#e0e7ff; padding:20px; border-radius:10px; text-align:center;">
-                    <div style="font-size:48px; margin-bottom:10px;">📄</div>
-                    <div style="font-size:24px; font-weight:bold; color:#1e3c72;">${escapeHtml(pdfRef)}</div>
-                    <div style="font-size:14px; color:#6b7280; margin-top:5px;">
-                        📁 الملف : ${escapeHtml(pdfRef)}.pdf
-                    </div>
-                    <button onclick="copyReference('${escapeHtml(pdfRef)}')" class="btn btn-success" style="margin-top:15px;">
-                        📋 نسخ المرجع
-                    </button>
-                </div>
-            `;
-
-            previewDiv.style.display = 'block';
-        }
-
-        function copyReference(ref) {
-            navigator.clipboard.writeText(ref).then(() => {
-                alert('✅ تم نسخ المرجع : ' + ref);
-            }).catch(() => {
-                const textArea = document.createElement('textarea');
-                textArea.value = ref;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                alert('✅ تم نسخ المرجع : ' + ref);
-            });
         }
 
         // ================================================================
@@ -1339,6 +1566,7 @@
                 courriers = [];
                 saveData();
             }
+
             currentDisplayList = [...courriers];
             applyFilterByTab();
             calculerStatistiques();
@@ -1371,6 +1599,8 @@
             document.getElementById('pdfFileInfo').style.display = 'none';
             document.getElementById('pdfFileInfo').innerHTML = '';
             document.getElementById('pdfFileInput').value = '';
+            pdfFilesSelected = [];
+            currentPdfRef = null;
             updateExpediteurLabel();
         }
 
@@ -1386,7 +1616,7 @@
             saveCourrier();
         });
 
-        function saveCourrier() {
+        async function saveCourrier() {
             const type = document.getElementById('typeCourrier').value;
             const numero = document.getElementById('numero').value.trim();
             const date = document.getElementById('date').value;
@@ -1406,6 +1636,16 @@
                 return;
             }
 
+            // Sauvegarder les PDF dans IndexedDB
+            const pdfIds = [];
+            if (pdfFilesSelected.length > 0 && pdfRef) {
+                for (const file of pdfFilesSelected) {
+                    const id = genererIdPDF();
+                    await sauvegarderPDF(id, pdfRef, file.name, type, file);
+                    pdfIds.push(id);
+                }
+            }
+
             const courrierData = {
                 id: editMode ? editId : Date.now() + Math.random(),
                 type: type,
@@ -1416,6 +1656,7 @@
                 contenu: contenu,
                 priorite: priorite,
                 pdfRef: pdfRef || '',
+                pdfIds: pdfIds,
                 createdBy: currentUser,
                 createdAt: new Date().toISOString()
             };
@@ -1477,6 +1718,11 @@
             }
             if (!confirm('هل أنت متأكد من حذف هذه المراسلة نهائياً؟')) return;
 
+            const courrier = courriers.find(c => c.id === id);
+            if (courrier && courrier.pdfRef) {
+                supprimerPDFParRef(courrier.pdfRef).catch(err => console.error('Erreur suppression PDF:', err));
+            }
+
             courriers = courriers.filter(c => c.id !== id);
             saveData();
             applyFilterByTab();
@@ -1521,6 +1767,9 @@
                     'Basse': '<span class="badge" style="background:#6b7280;">🔵 منخفضة</span>'
                 };
                 const prioriteBadge = prioriteLabels[c.priorite] || '';
+                const pdfBadge = hasDoc ?
+                    `<span class="pdf-badge loaded">📎 PDF</span>` :
+                    '';
 
                 let actionsHtml = '';
                 if (isAdmin) {
@@ -1539,12 +1788,12 @@
                             <span class="badge ${langClass}">${langText}</span>
                             <span class="type-badge ${typeClass}">${typeLabel}</span>
                             ${prioriteBadge}
-                            ${hasDoc ? `<span class="badge badge-pdf">📎 PDF</span>` : ''}
+                            ${pdfBadge}
                         </div>
                         <div class="expediteur">✉️ ${escapeHtml(c.expediteur)}</div>
                         <div class="objet">📌 ${escapeHtml(c.objet)}</div>
                         <div class="date">📅 ${formatDate(c.date)}</div>
-                        ${hasDoc ? `<div class="doc-ref">📄 المرجع: <strong>${escapeHtml(c.pdfRef)}</strong></div>` : ''}
+                        ${c.pdfRef ? `<div class="doc-ref">📄 المرجع: <strong>${escapeHtml(c.pdfRef)}</strong></div>` : ''}
                         ${actionsHtml}
                     </div>
                 `;
@@ -1555,7 +1804,7 @@
         //  SELECTION
         // ================================================================
 
-        function selectCourrier(id) {
+        async function selectCourrier(id) {
             currentSelectedId = id;
             const courrier = courriers.find(c => c.id === id);
 
@@ -1566,10 +1815,15 @@
                 return;
             }
 
+            console.log('📋 Courrier sélectionné:', courrier.numero, 'Réf PDF:', courrier.pdfRef);
+
+            // Afficher les PDF
             if (courrier.pdfRef) {
-                showDocumentReference(courrier.pdfRef);
+                await afficherPDFs(courrier.pdfRef);
             } else {
                 document.getElementById('apercuZone').style.display = 'none';
+                document.getElementById('pdfListPreview').innerHTML =
+                    '<div class="empty-pdf-message">📭 لا توجد مستندات مرفقة</div>';
             }
 
             const typeLabel = courrier.type === 'arrive' ? '📥 وارد' : '📤 صادر';
@@ -1734,7 +1988,7 @@
         }
 
         // ================================================================
-        //  EXPORT / IMPORT
+        //  EXPORT / IMPORT (version simplifiée)
         // ================================================================
 
         function exportCSV() {
@@ -1880,8 +2134,16 @@
 
         document.getElementById('date').valueAsDate = new Date();
 
+        // Ouvrir IndexedDB
+        ouvrirDB().catch(err => {
+            console.error('❌ Erreur d\'ouverture de la base:', err);
+            document.getElementById('dbStatus').innerHTML =
+                '📁 قاعدة البيانات: <span class="offline">❌ غير متصلة</span>';
+        });
+
+        // Vérifier la session
         if (!checkSession()) {
-            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('appContent').classList.add('hidden');
         } else {
             setTimeout(calculerStatistiques, 500);
