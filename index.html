@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📮 Gestion des Courriers - Accueil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Noto Sans', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ====== ANIMATION DE FOND ====== */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            animation: float 25s infinite ease-in-out;
+        }
+
+        .bg-animation .circle:nth-child(1) {
+            width: 350px;
+            height: 350px;
+            top: -120px;
+            left: -120px;
+            animation-delay: 0s;
+        }
+
+        .bg-animation .circle:nth-child(2) {
+            width: 450px;
+            height: 450px;
+            bottom: -180px;
+            right: -180px;
+            animation-delay: -6s;
+        }
+
+        .bg-animation .circle:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -12s;
+        }
+
+        .bg-animation .circle:nth-child(4) {
+            width: 120px;
+            height: 120px;
+            top: 15%;
+            right: 8%;
+            animation-delay: -3s;
+        }
+
+        .bg-animation .circle:nth-child(5) {
+            width: 180px;
+            height: 180px;
+            bottom: 25%;
+            left: 8%;
+            animation-delay: -9s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(60px, -40px) scale(1.1);
+            }
+            50% {
+                transform: translate(-30px, 60px) scale(0.9);
+            }
+            75% {
+                transform: translate(40px, -25px) scale(1.05);
+            }
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+        }
+
+        /* ====== CONTAINER ====== */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+        }
+
+        /* ====== EN-TÊTE ====== */
+        .header {
+            text-align: center;
+            color: white;
+        }
+
+        .header .logo {
+            font-size: 72px;
+            margin-bottom: 8px;
+            display: block;
+            animation: pulse 2.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.5px;
+        }
+
+        /* ====== GRILLE DES APPLICATIONS ====== */
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 35px;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        /* ====== CARTE ====== */
+        .app-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 30px 35px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .app-card:hover::before {
+            opacity: 1;
+        }
+
+        .app-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .app-card .icon-wrapper {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            font-size: 44px;
+            transition: all 0.4s;
+        }
+
+        .app-card:hover .icon-wrapper {
+            transform: scale(1.08) rotate(-4deg);
+        }
+
+        .app-card .icon-wrapper.courriers {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .app-card .icon-wrapper.admin {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 8px 30px rgba(245, 87, 108, 0.3);
+        }
+
+        .app-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .app-card p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .app-card .badge-group {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .app-card .badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .app-card .badge.arrive {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .app-card .badge.depart {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .app-card .badge.admin {
+            background: rgba(244, 63, 94, 0.2);
+            color: #fb7185;
+        }
+
+        .app-card .badge.secure {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .app-card .btn-access {
+            margin-top: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s;
+        }
+
+        .app-card:hover .btn-access {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateX(4px);
+        }
+
+        .app-card .btn-access .arrow {
+            transition: transform 0.3s;
+        }
+
+        .app-card:hover .btn-access .arrow {
+            transform: translateX(4px);
+        }
+
+        /* ====== CARTE ADMIN ====== */
+        .app-card.admin-card {
+            border-color: rgba(245, 87, 108, 0.15);
+        }
+
+        .app-card.admin-card:hover {
+            border-color: rgba(245, 87, 108, 0.35);
+        }
+
+        /* ====== PIED DE PAGE ====== */
+        .footer {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 13px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .footer span {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* ====== RESPONSIVE ====== */
+        @media (max-width: 700px) {
+            .apps-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+                max-width: 400px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+            .header .logo {
+                font-size: 56px;
+            }
+
+            .app-card {
+                padding: 30px 20px 25px;
+            }
+
+            .app-card .icon-wrapper {
+                width: 72px;
+                height: 72px;
+                font-size: 34px;
+            }
+
+            .app-card h3 {
+                font-size: 19px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 22px;
+            }
+            .header .logo {
+                font-size: 44px;
+            }
+            .app-card h3 {
+                font-size: 17px;
+            }
+            .app-card p {
+                font-size: 13px;
+            }
+            .app-card .btn-access {
+                font-size: 13px;
+                padding: 6px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ====== ANIMATION DE FOND ====== -->
+    <div class="bg-animation">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+
+    <!-- ====== CONTENU PRINCIPAL ====== -->
+    <div class="container">
+
+        <!-- En-tête -->
+        <div class="header">
+            <span class="logo">📮</span>
+            <h1>Gestion des Courriers</h1>
+            <p>Plateforme de gestion des courriers entrants et sortants</p>
+        </div>
+
+        <!-- Grille des applications -->
+        <div class="apps-grid">
+
+            <!-- ====== CARTE COURRIERS ====== -->
+            <a href="courriers.html" class="app-card">
+                <div class="icon-wrapper courriers">📄</div>
+                <h3>📮 Gestion des Courriers</h3>
+                <p>Consultez, recherchez et gérez vos courriers entrants et sortants.</p>
+                <div class="badge-group">
+                    <span class="badge arrive">📥 Arrivés</span>
+                    <span class="badge depart">📤 Départs</span>
+                </div>
+                <div class="btn-access">
+                    Accéder <span class="arrow">→</span>
+                </div>
+            </a>
+
+            <!-- ====== CARTE ADMIN ====== -->
+            <a href="admin.html" class="app-card admin-card">
+                <div class="icon-wrapper admin">⚙️</div>
+                <h3>⚙️ Administration</h3>
+                <p>Gérez les utilisateurs, les permissions et les paramètres de l'application.</p>
+                <div class="badge-group">
+                    <span class="badge admin">🔒 Sécurisé</span>
+                    <span class="badge secure">🛡️ Accès restreint</span>
+                </div>
+                <div class="btn-access">
+                    Accéder <span class="arrow">→</span>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Pied de page -->
+        <div class="footer">
+            <span>© 2026 Gestion des Courriers</span> · <span>Tous droits réservés</span>
+        </div>
+    </div>
+
+    <script>
+        // Effet de survol sur les cartes
+        document.querySelectorAll('.app-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('.icon-wrapper');
+                if (icon) {
+                    icon.style.transition = 'transform 0.5s ease';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
