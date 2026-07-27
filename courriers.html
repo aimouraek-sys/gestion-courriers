@@ -451,6 +451,35 @@
             background: #7c3aed;
         }
 
+        .btn-folder {
+            background: #f59e0b;
+            color: white;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-folder:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-folder.copied {
+            background: #10b981;
+        }
+
+        .btn-folder.copied:hover {
+            background: #059669;
+        }
+
         .search-filters {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -596,6 +625,13 @@
             display: inline-block;
         }
 
+        .courrier-item .item-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
         .badge {
             display: inline-block;
             padding: 3px 8px;
@@ -637,10 +673,6 @@
         .type-depart {
             background: #dbeafe;
             color: #1e40af;
-        }
-
-        .courrier-item .actions {
-            margin-top: 10px;
         }
 
         .details-content {
@@ -720,20 +752,6 @@
             min-width: 120px;
         }
 
-        .doc-instruction {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-            font-size: 13px;
-            color: #92400e;
-        }
-
-        .doc-instruction strong {
-            color: #78350f;
-        }
-
         .edit-mode-indicator {
             background: #ffc107;
             padding: 8px;
@@ -751,6 +769,11 @@
             background: #f8fafc;
             border-radius: 10px;
             border: 1px solid #e2e8f0;
+            display: none;
+        }
+
+        .apercu-pdf.visible {
+            display: block;
         }
 
         .pdf-viewer {
@@ -758,6 +781,39 @@
             height: 400px;
             border: none;
             border-radius: 8px;
+            background: white;
+        }
+
+        .pdf-list-preview {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+
+        .pdf-list-preview .pdf-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            padding: 4px 12px 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            margin: 2px;
+        }
+
+        .pdf-list-preview .pdf-item .pdf-name {
+            color: #1e3c72;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .pdf-list-preview .pdf-item .pdf-size {
+            font-size: 11px;
+            color: #6b7280;
         }
 
         @media (max-width: 768px) {
@@ -825,7 +881,10 @@
         <div class="login-box">
             <h1>📮 إدارة المراسلات</h1>
             <p class="subtitle">تسجيل الدخول</p>
+
             <div id="loginError" class="error-msg"></div>
+            <div id="loginInfo" class="info-msg"></div>
+
             <div class="form-group">
                 <label>👤 اسم المستخدم</label>
                 <input type="text" id="loginUser" placeholder="أدخل اسم المستخدم">
@@ -844,6 +903,7 @@
     ================================================================ -->
     <div id="appContent" class="container hidden">
 
+        <!-- HEADER -->
         <div class="header">
             <div class="user-bar">
                 <div class="user-info-display">
@@ -870,11 +930,10 @@
                 <form id="courrierForm">
                     <input type="hidden" id="editIndex" value="-1">
 
-                    <!-- ====== SECTION CHARGEMENT PDF ====== -->
                     <div class="pdf-upload-section">
                         <label>📂 تحميل ملف PDF</label>
                         <div class="upload-row">
-                            <input type="file" id="pdfFileInput" accept=".pdf">
+                            <input type="file" id="pdfFileInput" accept=".pdf" multiple>
                             <button type="button" class="btn btn-sm btn-success" onclick="chargerPDF()">📥 تحميل</button>
                             <button type="button" class="btn btn-sm btn-secondary" onclick="deverrouillerChamps()">🔓 فتح التعديل</button>
                         </div>
@@ -932,7 +991,9 @@
                                 <input type="text" id="pdfRef" placeholder="مثال: 001-15-01-2024" style="flex:1;">
                                 <button type="button" class="btn btn-sm btn-primary" onclick="genererReference()" style="white-space:nowrap; padding:8px 12px;">🔄 توليد</button>
                             </div>
-                            <div style="font-size:11px; color:#6b7280; margin-top:3px;">💡 يتم توليده تلقائياً من الرقم والتاريخ</div>
+                            <div style="font-size:11px; color:#6b7280; margin-top:3px;">
+                                💡 يتم توليده تلقائياً من الرقم والتاريخ
+                            </div>
                         </div>
                     </div>
 
@@ -976,7 +1037,6 @@
                     <button onclick="resetSearch()" class="btn btn-secondary" style="flex:1;">🔄 إعادة تعيين</button>
                 </div>
 
-                <!-- Statistiques -->
                 <div style="margin-bottom:15px;">
                     <div class="stat-filters">
                         <div class="form-group"><label>تاريخ البداية</label><input type="date" id="statsDateDebut"></div>
@@ -1003,22 +1063,15 @@
         </div>
 
         <!-- ====== ZONE D'APERÇU PDF ====== -->
-        <div id="apercuZone" class="card" style="margin-top:20px; display:none;">
+        <div id="apercuZone" class="apercu-pdf">
             <h3>📄 مرجع المستند</h3>
             <div id="pdfListPreview" style="margin-bottom:10px;"></div>
-            <div class="doc-instruction">
-                📁 <strong>تعليمات :</strong><br>
-                1️⃣ انسخ المرجع أعلاه<br>
-                2️⃣ افتح المجلد <strong>C:\pdfs\</strong> أو المجلد المشترك<br>
-                3️⃣ ابحث عن الملف بهذا المرجع<br>
-                4️⃣ افتحه باستخدام قارئ PDF الخاص بك
+            <div id="pdfViewerContainer" style="margin-top:10px;">
+                <iframe id="pdfViewer" class="pdf-viewer" src=""></iframe>
             </div>
         </div>
     </div>
 
-    <!-- ================================================================
-    SCRIPTS
-    ================================================================ -->
     <script>
         // ================================================================
         //  🔐 AUTHENTIFICATION
@@ -1056,6 +1109,7 @@
         let currentUser = null;
         let currentUserData = null;
         let isAdmin = false;
+        let currentPdfRef = '';
 
         function loginUser() {
             const username = document.getElementById('loginUser').value.trim();
@@ -1077,7 +1131,7 @@
 
             localStorage.setItem('courriers_session', JSON.stringify({ user: username, role: users[username].role }));
 
-            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContent').classList.remove('hidden');
             updateUserDisplay();
 
@@ -1091,7 +1145,7 @@
             currentUser = null;
             currentUserData = null;
             isAdmin = false;
-            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('appContent').classList.add('hidden');
             document.getElementById('loginPassword').value = '';
             document.getElementById('loginError').style.display = 'none';
@@ -1126,7 +1180,7 @@
                         currentUser = data.user;
                         currentUserData = users[data.user];
                         isAdmin = data.role === 'admin';
-                        document.getElementById('loginScreen').classList.add('hidden');
+                        document.getElementById('loginScreen').style.display = 'none';
                         document.getElementById('appContent').classList.remove('hidden');
                         updateUserDisplay();
                         if (isAdmin) { document.getElementById('adminBtn').style.display = 'inline-block'; }
@@ -1143,19 +1197,32 @@
         //  Format : NNN-JJ-MM-AAAA.pdf
         // ================================================================
 
-        let pdfFileSelected = null;
+        let pdfFilesSelected = [];
 
         document.getElementById('pdfFileInput').addEventListener('change', function() {
-            const file = this.files[0];
-            if (file && file.name.endsWith('.pdf')) {
-                pdfFileSelected = file;
-                extraireDonneesNomFichier(file.name);
+            const files = this.files;
+            if (files.length > 0) {
+                pdfFilesSelected = Array.from(files);
+                afficherInfosPDF(pdfFilesSelected);
             } else {
-                pdfFileSelected = null;
+                pdfFilesSelected = [];
                 document.getElementById('pdfFileInfo').style.display = 'none';
-                document.getElementById('pdfFileInfo').innerHTML = '';
             }
         });
+
+        function afficherInfosPDF(files) {
+            const infoDiv = document.getElementById('pdfFileInfo');
+            infoDiv.style.display = 'block';
+            infoDiv.style.color = '#065f46';
+            infoDiv.innerHTML = `
+                ✅ <span style="font-weight:600;">${files.length} fichier(s) sélectionné(s) :</span><br>
+                ${files.map(f => `📎 ${f.name} (${(f.size / 1024).toFixed(1)} KB)`).join('<br>')}
+            `;
+
+            if (files.length === 1) {
+                extraireDonneesNomFichier(files[0].name);
+            }
+        }
 
         function chargerPDF() {
             document.getElementById('pdfFileInput').click();
@@ -1169,8 +1236,8 @@
                 const infoDiv = document.getElementById('pdfFileInfo');
                 infoDiv.style.display = 'block';
                 infoDiv.style.color = '#dc2626';
-                infoDiv.style.textAlign = 'left';
-                infoDiv.innerHTML = '⚠️ <span style="color:#dc2626;">صيغة الملف غير صالحة.</span><br>الصيغة المطلوبة : <strong>001-15-01-2024.pdf</strong>';
+                infoDiv.innerHTML =
+                    '⚠️ <span style="color:#dc2626;">صيغة الملف غير صالحة.</span><br>الصيغة المطلوبة : <strong>001-15-01-2024.pdf</strong>';
                 return;
             }
 
@@ -1183,8 +1250,8 @@
                 const infoDiv = document.getElementById('pdfFileInfo');
                 infoDiv.style.display = 'block';
                 infoDiv.style.color = '#dc2626';
-                infoDiv.style.textAlign = 'left';
-                infoDiv.innerHTML = '⚠️ <span style="color:#dc2626;">صيغة الملف غير صالحة.</span><br>الصيغة المطلوبة : <strong>001-15-01-2024.pdf</strong>';
+                infoDiv.innerHTML =
+                    '⚠️ <span style="color:#dc2626;">صيغة الملف غير صالحة.</span><br>الصيغة المطلوبة : <strong>001-15-01-2024.pdf</strong>';
                 return;
             }
 
@@ -1205,7 +1272,6 @@
             const infoDiv = document.getElementById('pdfFileInfo');
             infoDiv.style.display = 'block';
             infoDiv.style.color = '#065f46';
-            infoDiv.style.textAlign = 'left';
             infoDiv.innerHTML = `
                 ✅ <span style="font-weight:600;">تم استخراج البيانات :</span><br>
                 📝 الرقم : <strong>${numeroComplet}</strong><br>
@@ -1219,8 +1285,10 @@
                 const el = document.getElementById(id);
                 el.style.borderColor = '#10b981';
                 el.style.backgroundColor = '#f0fdf4';
-                setTimeout(() => { el.style.borderColor = '';
-                    el.style.backgroundColor = ''; }, 2000);
+                setTimeout(() => {
+                    el.style.borderColor = '';
+                    el.style.backgroundColor = '';
+                }, 2000);
             });
 
             updateExpediteurLabel();
@@ -1261,8 +1329,10 @@
             const input = document.getElementById('pdfRef');
             input.style.borderColor = '#10b981';
             input.style.backgroundColor = '#f0fdf4';
-            setTimeout(() => { input.style.borderColor = '';
-                input.style.backgroundColor = ''; }, 1500);
+            setTimeout(() => {
+                input.style.borderColor = '';
+                input.style.backgroundColor = '';
+            }, 1500);
         }
 
         document.getElementById('numero').addEventListener('change', function() {
@@ -1293,7 +1363,7 @@
                     <div style="font-size:14px; color:#6b7280; margin-top:5px;">
                         📁 الملف : ${escapeHtml(pdfRef)}.pdf
                     </div>
-                    <button onclick="copyReference('${escapeHtml(pdfRef)}')" class="btn btn-success" style="margin-top:15px;">
+                    <button onclick="copierReference('${escapeHtml(pdfRef)}')" class="btn btn-success" style="margin-top:15px;">
                         📋 نسخ المرجع
                     </button>
                 </div>
@@ -1302,7 +1372,7 @@
             previewDiv.style.display = 'block';
         }
 
-        function copyReference(ref) {
+        function copierReference(ref) {
             navigator.clipboard.writeText(ref).then(() => {
                 alert('✅ تم نسخ المرجع : ' + ref);
             }).catch(() => {
@@ -1313,6 +1383,40 @@
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
                 alert('✅ تم نسخ المرجع : ' + ref);
+            });
+        }
+
+        // ================================================================
+        //  📁 OUVRIR LE DOSSIER DES PDF - BOUTON DANS CHAQUE COURRIER
+        // ================================================================
+
+        function ouvrirDossierPDF(type, ref) {
+            const dossier = type === 'arrive' ? 'arrives' : 'departs';
+            const chemin = 'C:/pdfs/' + dossier;
+
+            // Copier le chemin
+            navigator.clipboard.writeText(chemin).then(() => {
+                // Copier aussi la référence
+                if (ref) {
+                    navigator.clipboard.writeText(ref).then(() => {
+                        alert('📁 مسار المجلد : ' + chemin +
+                            '\n📄 Référence du document : ' + ref +
+                            '\n\n✅ Les deux ont été copiés dans le presse-papiers !\n\n' +
+                            '1. Ouvrez l\'explorateur de fichiers (Windows+E)\n' +
+                            '2. Collez le chemin dans la barre d\'adresse\n' +
+                            '3. Recherchez le fichier avec la référence : ' + ref);
+                    }).catch(() => {
+                        alert('📁 Ouvrez ce dossier :\n' + chemin +
+                            '\n📄 Référence : ' + ref);
+                    });
+                } else {
+                    alert('📁 Chemin copié : ' + chemin +
+                        '\n\n1. Ouvrez l\'explorateur de fichiers (Windows+E)\n' +
+                        '2. Collez le chemin dans la barre d\'adresse');
+                }
+            }).catch(() => {
+                alert('📁 Ouvrez ce dossier :\n' + chemin +
+                    (ref ? '\n📄 Référence : ' + ref : ''));
             });
         }
 
@@ -1339,6 +1443,7 @@
                 courriers = [];
                 saveData();
             }
+
             currentDisplayList = [...courriers];
             applyFilterByTab();
             calculerStatistiques();
@@ -1371,6 +1476,7 @@
             document.getElementById('pdfFileInfo').style.display = 'none';
             document.getElementById('pdfFileInfo').innerHTML = '';
             document.getElementById('pdfFileInput').value = '';
+            pdfFilesSelected = [];
             updateExpediteurLabel();
         }
 
@@ -1522,13 +1628,18 @@
                 };
                 const prioriteBadge = prioriteLabels[c.priorite] || '';
 
+                // 🔥 Bouton "Ouvrir le dossier" pour chaque courrier avec PDF
+                const dossierBtn = hasDoc ? `
+                    <button class="btn-folder" onclick="event.stopPropagation(); ouvrirDossierPDF('${c.type}', '${escapeHtml(c.pdfRef)}')">
+                        📂 فتح المجلد
+                    </button>
+                ` : '';
+
                 let actionsHtml = '';
                 if (isAdmin) {
                     actionsHtml = `
-                        <div class="actions" onclick="event.stopPropagation();">
-                            <button class="btn btn-sm btn-warning" onclick="editCourrier(${c.id})">✏️ تعديل</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteCourrier(${c.id})">🗑 حذف</button>
-                        </div>
+                        <button class="btn btn-sm btn-warning" onclick="event.stopPropagation(); editCourrier(${c.id})">✏️ تعديل</button>
+                        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteCourrier(${c.id})">🗑 حذف</button>
                     `;
                 }
 
@@ -1544,8 +1655,11 @@
                         <div class="expediteur">✉️ ${escapeHtml(c.expediteur)}</div>
                         <div class="objet">📌 ${escapeHtml(c.objet)}</div>
                         <div class="date">📅 ${formatDate(c.date)}</div>
-                        ${hasDoc ? `<div class="doc-ref">📄 المرجع: <strong>${escapeHtml(c.pdfRef)}</strong></div>` : ''}
-                        ${actionsHtml}
+                        ${c.pdfRef ? `<div class="doc-ref">📄 المرجع: <strong>${escapeHtml(c.pdfRef)}</strong></div>` : ''}
+                        <div class="item-actions">
+                            ${dossierBtn}
+                            ${actionsHtml}
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -1592,6 +1706,9 @@
                         <p style="font-size:12px; color:#6b7280; margin-top:5px;">
                             📁 الملف : ${escapeHtml(courrier.pdfRef)}.pdf
                         </p>
+                        <button onclick="ouvrirDossierPDF('${courrier.type}', '${escapeHtml(courrier.pdfRef)}')" class="btn btn-sm btn-warning" style="margin-top:10px;">
+                            📂 فتح المجلد
+                        </button>
                     ` : '<p><em>لا يوجد مستند مرفق</em></p>'}
                 </div>
             `;
@@ -1881,7 +1998,7 @@
         document.getElementById('date').valueAsDate = new Date();
 
         if (!checkSession()) {
-            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('appContent').classList.add('hidden');
         } else {
             setTimeout(calculerStatistiques, 500);
