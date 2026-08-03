@@ -222,18 +222,27 @@
 
     <script>
         // VOTRE CONFIGURATION FIREBASE (à remplacer)
-        const firebaseConfig = {
-            apiKey: "VOTRE_API_KEY",
-            authDomain: "VOTRE_PROJET.firebaseapp.com",
-            projectId: "VOTRE_PROJET_ID",
-            storageBucket: "VOTRE_PROJET.appspot.com",
-            messagingSenderId: "VOTRE_SENDER_ID",
-            appId: "VOTRE_APP_ID"
-        };
+        // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCVe7bwjBFqumgn3iqfTyBf7Nnro6QYXz4",
+  authDomain: "gestion-courriers-aim.firebaseapp.com",
+  projectId: "gestion-courriers-aim",
+  storageBucket: "gestion-courriers-aim.firebasestorage.app",
+  messagingSenderId: "90289894897",
+  appId: "1:90289894897:web:44be3f180ff3876d820050"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
         // Initialiser Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+       // firebase.initializeApp(firebaseConfig);
+      //  const auth = firebase.auth();
 
         // Références DOM
         const messageDiv = document.getElementById('message');
