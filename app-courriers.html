@@ -37,11 +37,6 @@
                 document.getElementById('appContent').classList.remove('hidden');
                 updateUserDisplay();
                 
-                // Afficher le bouton admin si l'utilisateur est admin
-                if (isAdmin) {
-                    document.getElementById('adminBtn').style.display = 'inline-block';
-                }
-                
                 loadData();
                 setTimeout(calculerStatistiques, 500);
             }
@@ -1028,7 +1023,6 @@
                     <span id="currentUserRole" class="user-role">جاري التحميل...</span>
                 </div>
                 <div>
-                    <button class="btn-admin" onclick="window.location.href='admin.html'" id="adminBtn" style="display:none;">⚙️ إدارة</button>
                     <button class="btn-logout" onclick="logoutUser()">🚪 تسجيل الخروج</button>
                 </div>
             </div>
@@ -1492,22 +1486,9 @@
                 var displayName = firebaseUser.email || 'Utilisateur';
                 document.getElementById('currentUserDisplay').textContent = displayName;
                 
-                var users = getUsers();
-                var userData = users[displayName] || users['user'];
-                var isAdminLocal = userData ? userData.role === 'admin' : false;
-                
                 var roleEl = document.getElementById('currentUserRole');
-                if (isAdminLocal) {
-                    roleEl.textContent = '⭐ مسؤول';
-                    roleEl.className = 'user-role admin';
-                    document.getElementById('adminBtn').style.display = 'inline-block';
-                    isAdmin = true;
-                } else {
-                    roleEl.textContent = '👁️ مستخدم';
-                    roleEl.className = 'user-role';
-                    document.getElementById('adminBtn').style.display = 'none';
-                    isAdmin = false;
-                }
+                roleEl.textContent = '👁️ مستخدم';
+                roleEl.className = 'user-role';
             }
         }
 
@@ -1518,7 +1499,7 @@
         // ================================================================
         //  CRUD COURRIERS - VERSION CORRIGÉE
         //  ✅ Tout utilisateur Firebase peut AJOUTER
-        //  ✅ Seul l'admin peut MODIFIER et SUPPRIMER
+        //  ✅ Tout le monde peut MODIFIER et SUPPRIMER (Solution 2)
         // ================================================================
 
         function resetForm() {
@@ -1577,11 +1558,11 @@
                 return;
             }
 
-            // ✅ Seul l'admin peut modifier (mais tout le monde peut ajouter)
-            if (editMode && !isAdmin) {
-                alert('⚠️ Seul l\'administrateur peut modifier une courrier.');
-                return;
-            }
+            // ✅ Tout le monde peut modifier (plus de restriction admin)
+            // if (editMode && !isAdmin) {
+            //     alert('⚠️ Seul l\'administrateur peut modifier une courrier.');
+            //     return;
+            // }
 
             var courrierData = {
                 id: editMode ? editId : Date.now() + Math.random(),
@@ -1614,10 +1595,11 @@
         }
 
         function editCourrier(id) {
-            if (!isAdmin) {
-                alert('⚠️ Seul l\'administrateur peut modifier une courrier.');
-                return;
-            }
+            // ✅ Plus de vérification admin - tout le monde peut modifier
+            // if (!isAdmin) {
+            //     alert('⚠️ Seul l\'administrateur peut modifier une courrier.');
+            //     return;
+            // }
 
             var courrier = null;
             for (var i = 0; i < courriers.length; i++) {
@@ -1651,10 +1633,12 @@
         function cancelEdit() { resetForm(); }
 
         function deleteCourrier(id) {
-            if (!isAdmin) {
-                alert('⚠️ Seul l\'administrateur peut supprimer une courrier.');
-                return;
-            }
+            // ✅ Plus de vérification admin - tout le monde peut supprimer
+            // if (!isAdmin) {
+            //     alert('⚠️ Seul l\'administrateur peut supprimer une courrier.');
+            //     return;
+            // }
+            
             if (!confirm('هل أنت متأكد من حذف هذه المراسلة نهائياً؟')) return;
 
             var nouveauCourriers = [];
@@ -1676,7 +1660,7 @@
         }
 
         // ================================================================
-        //  AFFICHAGE LISTE
+        //  AFFICHAGE LISTE - SOLUTION 2 : TOUT LE MONDE VOIT LES BOUTONS
         // ================================================================
 
         function displayCourriers(list) {
@@ -1714,12 +1698,10 @@
                     dossierBtn = '<button class="btn-folder" onclick="event.stopPropagation(); ouvrirDossierPDF(\'' + c.type + '\', \'' + escapeHtml(c.pdfRef) + '\')">📂 فتح المجلد</button>';
                 }
 
-                var actionsHtml = '';
-                // ✅ Seul l'admin voit les boutons Modifier et Supprimer
-                if (isAdmin) {
-                    actionsHtml = '<button class="btn btn-sm btn-warning" onclick="event.stopPropagation(); editCourrier(' + c.id + ')">✏️ تعديل</button>' +
-                        '<button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteCourrier(' + c.id + ')">🗑 حذف</button>';
-                }
+                // ✅ SOLUTION 2 : Tout le monde voit les boutons Modifier et Supprimer
+                var actionsHtml = 
+                    '<button class="btn btn-sm btn-warning" onclick="event.stopPropagation(); editCourrier(' + c.id + ')">✏️ تعديل</button>' +
+                    '<button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteCourrier(' + c.id + ')">🗑 حذف</button>';
 
                 html += '<div class="courrier-item ' + (isSelected ? 'selected' : '') + '" onclick="selectCourrier(' + c.id + ')">' +
                     '<div class="numero">📄 ' + escapeHtml(c.numero) +
@@ -2035,7 +2017,7 @@
         console.log('✅ Application protégée par Firebase');
         console.log('🌍 Orientation: Droite vers Gauche (RTL)');
         console.log('✅ Tout utilisateur Firebase peut AJOUTER des courriers');
-        console.log('✅ Seul l\'administrateur peut MODIFIER et SUPPRIMER');
+        console.log('✅ Tout le monde peut MODIFIER et SUPPRIMER (Solution 2)');
     </script>
 </body>
 </html>
