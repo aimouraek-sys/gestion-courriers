@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentification - Gestion des Courriers</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .auth-container {
+            max-width: 420px;
+            width: 100%;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .auth-container h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .message {
+            padding: 12px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        .message.error { background: #fee; color: #d63031; display: block; }
+        .message.success { background: #e8f5e9; color: #27ae60; display: block; }
+        .message.info { background: #e3f2fd; color: #1976d2; display: block; }
+        .toggle-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        .toggle-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .toggle-link a:hover { text-decoration: underline; }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2>🔐 Authentification</h2>
+        
+        <div id="message" class="message"></div>
+        <div id="loading" class="loading"><div class="spinner"></div><p style="margin-top: 10px; color: #666;">Connexion en cours...</p></div>
+        
+        <!-- Connexion -->
+        <div id="loginForm">
+            <div class="form-group">
+                <label>📧 Email</label>
+                <input type="email" id="loginEmail" placeholder="admin@exemple.com">
+            </div>
+            <div class="form-group">
+                <label>🔑 Mot de passe</label>
+                <input type="password" id="loginPassword" placeholder="••••••••">
+            </div>
+            <button class="btn" onclick="loginUser()">Se connecter</button>
+            <div class="toggle-link">
+                Pas de compte ? <a onclick="showRegister()">S'inscrire</a>
+            </div>
+        </div>
+        
+        <!-- Inscription -->
+        <div id="registerForm" style="display: none;">
+            <div class="form-group">
+                <label>📧 Email</label>
+                <input type="email" id="registerEmail" placeholder="admin@exemple.com">
+            </div>
+            <div class="form-group">
+                <label>🔑 Mot de passe</label>
+                <input type="password" id="registerPassword" placeholder="••••••••">
+                <div style="font-size: 12px; color: #888; margin-top: 5px;">Minimum 6 caractères</div>
+            </div>
+            <button class="btn" onclick="registerUser()">S'inscrire</button>
+            <div class="toggle-link">
+                Déjà un compte ? <a onclick="showLogin()">Se connecter</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // CONFIGURATION FIREBASE
+        // =============================================
+        var firebaseConfig = {
+            apiKey: "AIzaSyDFqRF8oX5NVh0uIeWNeh8W74F5TiLtZe4",
+  authDomain: "courriers-aim.firebaseapp.com",
+  projectId: "courriers-aim",
+  storageBucket: "courriers-aim.firebasestorage.app",
+  messagingSenderId: "763278473454",
+  appId: "1:763278473454:web:3dd6c894e75df2ef3f9bff"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        var auth = firebase.auth();
+
+        // =============================================
+        // FONCTIONS
+        // =============================================
+        function showMessage(text, type) {
+            var msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            msg.style.display = 'block';
+            setTimeout(function() { msg.style.display = 'none'; }, 5000);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+
+        function registerUser() {
+            var email = document.getElementById('registerEmail').value;
+            var password = document.getElementById('registerPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                showMessage('Mot de passe minimum 6 caractères', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(function() {
+                    showLoading(false);
+                    showMessage('✅ Inscription réussie !', 'success');
+                    setTimeout(function() { redirigerVersApp(); }, 1000);
+                })
+                .catch(function(error) {
+                    showLoading(false);
+                    showMessage(getErrorMessage(error.code), 'error');
+                });
+        }
+
+        function loginUser() {
+            var email = document.getElementById('loginEmail').value;
+            var password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then(function() {
+                    showLoading(false);
+                    showMessage('✅ Connexion réussie !', 'success');
+                    setTimeout(function() { redirigerVersApp(); }, 1000);
+                })
+                .catch(function(error) {
+                    showLoading(false);
+                    showMessage(getErrorMessage(error.code), 'error');
+                });
+        }
+
+        function redirigerVersApp() {
+            // Redirige vers VOTRE application de courriers
+            window.location.href = 'app-courriers.html';
+        }
+
+        // =============================================
+        // SI DÉJÀ CONNECTÉ, REDIRIGER DIRECTEMENT
+        // =============================================
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                // Déjà connecté, rediriger vers l'application
+                window.location.href = 'app-courriers.html';
+            }
+        });
+
+        // =============================================
+        // MESSAGES D'ERREUR
+        // =============================================
+        function getErrorMessage(code) {
+            var map = {
+                'auth/email-already-in-use': '❌ Cet email est déjà utilisé',
+                'auth/invalid-email': '❌ Email invalide',
+                'auth/weak-password': '❌ Mot de passe trop faible (6 caractères min)',
+                'auth/user-not-found': '❌ Aucun compte avec cet email',
+                'auth/wrong-password': '❌ Mot de passe incorrect',
+                'auth/too-many-requests': '⏳ Trop de tentatives, attendez',
+                'auth/network-request-failed': '🌐 Erreur réseau'
+            };
+            return map[code] || '❌ Erreur: ' + code;
+        }
+
+        // Touche Entrée
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (document.getElementById('loginForm').style.display !== 'none') {
+                    loginUser();
+                } else if (document.getElementById('registerForm').style.display !== 'none') {
+                    registerUser();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
