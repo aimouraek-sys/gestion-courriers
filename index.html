@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentification - Gestion des Courriers</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .auth-container {
+            max-width: 420px;
+            width: 100%;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .auth-container h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .auth-container .logo {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .message {
+            padding: 12px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        .message.error { background: #fee; color: #d63031; display: block; }
+        .message.success { background: #e8f5e9; color: #27ae60; display: block; }
+        .message.info { background: #e3f2fd; color: #1976d2; display: block; }
+        .toggle-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        .toggle-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .toggle-link a:hover { text-decoration: underline; }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 15px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info-connecte {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+            border: 1px solid #b8e0b8;
+        }
+        .info-connecte .email { font-weight: 600; color: #27ae60; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">📧</div>
+        <h2>🔐 Authentification</h2>
+        
+        <div id="infoConnecte" class="info-connecte">
+            ✅ Vous êtes déjà connecté en tant que <span class="email" id="emailConnecte">email@exemple.com</span>
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p style="color: #666;">Connexion en cours...</p>
+        </div>
+        
+        <!-- Connexion -->
+        <div id="loginForm">
+            <div class="form-group">
+                <label>📧 Email</label>
+                <input type="email" id="loginEmail" placeholder="admin@exemple.com">
+            </div>
+            <div class="form-group">
+                <label>🔑 Mot de passe</label>
+                <input type="password" id="loginPassword" placeholder="••••••••">
+            </div>
+            <button class="btn" id="loginBtn" onclick="loginUser()">Se connecter</button>
+            <div class="toggle-link">
+                Pas de compte ? <a onclick="showRegister()">S'inscrire</a>
+            </div>
+        </div>
+        
+        <!-- Inscription -->
+        <div id="registerForm" style="display: none;">
+            <div class="form-group">
+                <label>📧 Email</label>
+                <input type="email" id="registerEmail" placeholder="admin@exemple.com">
+            </div>
+            <div class="form-group">
+                <label>🔑 Mot de passe</label>
+                <input type="password" id="registerPassword" placeholder="••••••••">
+                <div style="font-size: 12px; color: #888; margin-top: 5px;">Minimum 6 caractères</div>
+            </div>
+            <button class="btn" id="registerBtn" onclick="registerUser()">S'inscrire</button>
+            <div class="toggle-link">
+                Déjà un compte ? <a onclick="showLogin()">Se connecter</a>
+            </div>
+        </div>
+        
+        <!-- Bouton pour aller à l'application (si déjà connecté) -->
+        <div style="margin-top: 20px; text-align: center; display: none;" id="btnAllerApp">
+            <button class="btn" onclick="allerVersApp()" style="background: #27ae60;">🚀 Accéder à l'application</button>
+            <br><br>
+            <button class="btn" onclick="logoutUser()" style="background: #e74c3c; margin-top: 5px;">Se déconnecter</button>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // 🔧 CONFIGURATION FIREBASE
+        // =============================================
+        var firebaseConfig = {
+           apiKey: "AIzaSyDFqRF8oX5NVh0uIeWNeh8W74F5TiLtZe4",
+  authDomain: "courriers-aim.firebaseapp.com",
+  projectId: "courriers-aim",
+  storageBucket: "courriers-aim.firebasestorage.app",
+  messagingSenderId: "763278473454",
+  appId: "1:763278473454:web:3dd6c894e75df2ef3f9bff"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        var auth = firebase.auth();
+
+        // =============================================
+        // RÉFÉRENCES
+        // =============================================
+        var loginBtn = document.getElementById('loginBtn');
+        var registerBtn = document.getElementById('registerBtn');
+        var loadingDiv = document.getElementById('loading');
+        var infoConnecte = document.getElementById('infoConnecte');
+        var emailConnecte = document.getElementById('emailConnecte');
+        var btnAllerApp = document.getElementById('btnAllerApp');
+
+        // =============================================
+        // FONCTIONS
+        // =============================================
+        function showMessage(text, type) {
+            var msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            msg.style.display = 'block';
+            setTimeout(function() { msg.style.display = 'none'; }, 5000);
+        }
+
+        function showLoading(show) {
+            loadingDiv.style.display = show ? 'block' : 'none';
+            loginBtn.disabled = show;
+            registerBtn.disabled = show;
+        }
+
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('message').style.display = 'none';
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('message').style.display = 'none';
+        }
+
+        function registerUser() {
+            var email = document.getElementById('registerEmail').value.trim();
+            var password = document.getElementById('registerPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                showMessage('Mot de passe minimum 6 caractères', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(function(userCredential) {
+                    showLoading(false);
+                    showMessage('✅ Inscription réussie ! Bienvenue ' + email, 'success');
+                    // Rediriger après 1.5 secondes
+                    setTimeout(function() {
+                        window.location.href = 'app-courriers.html';
+                    }, 1500);
+                })
+                .catch(function(error) {
+                    showLoading(false);
+                    showMessage(getErrorMessage(error.code), 'error');
+                    console.error('Erreur inscription:', error);
+                });
+        }
+
+        function loginUser() {
+            var email = document.getElementById('loginEmail').value.trim();
+            var password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then(function(userCredential) {
+                    showLoading(false);
+                    showMessage('✅ Connexion réussie ! Bienvenue ' + email, 'success');
+                    // Rediriger après 1.5 secondes
+                    setTimeout(function() {
+                        window.location.href = 'app-courriers.html';
+                    }, 1500);
+                })
+                .catch(function(error) {
+                    showLoading(false);
+                    showMessage(getErrorMessage(error.code), 'error');
+                    console.error('Erreur connexion:', error);
+                });
+        }
+
+        function allerVersApp() {
+            window.location.href = 'app-courriers.html';
+        }
+
+        function logoutUser() {
+            auth.signOut()
+                .then(function() {
+                    infoConnecte.style.display = 'none';
+                    btnAllerApp.style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'block';
+                    document.getElementById('registerForm').style.display = 'none';
+                    showMessage('Déconnecté', 'info');
+                })
+                .catch(function(error) {
+                    showMessage('Erreur de déconnexion', 'error');
+                });
+        }
+
+        // =============================================
+        // ⚠️ IMPORTANT : PAS DE REDIRECTION AUTOMATIQUE
+        // On affiche juste un message "déjà connecté"
+        // =============================================
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                // L'utilisateur est connecté, on affiche un message
+                // Mais on ne redirige PAS automatiquement
+                infoConnecte.style.display = 'block';
+                emailConnecte.textContent = user.email;
+                btnAllerApp.style.display = 'block';
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('registerForm').style.display = 'none';
+                console.log('✅ Utilisateur déjà connecté:', user.email);
+                console.log('👆 Cliquez sur "Accéder à l\'application" pour continuer');
+            } else {
+                infoConnecte.style.display = 'none';
+                btnAllerApp.style.display = 'none';
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+                console.log('🔓 Utilisateur déconnecté, en attente de saisie');
+            }
+        });
+
+        // =============================================
+        // MESSAGES D'ERREUR
+        // =============================================
+        function getErrorMessage(code) {
+            var map = {
+                'auth/email-already-in-use': '❌ Cet email est déjà utilisé',
+                'auth/invalid-email': '❌ Email invalide',
+                'auth/weak-password': '❌ Mot de passe trop faible (6 caractères min)',
+                'auth/user-not-found': '❌ Aucun compte avec cet email',
+                'auth/wrong-password': '❌ Mot de passe incorrect',
+                'auth/too-many-requests': '⏳ Trop de tentatives, attendez quelques minutes',
+                'auth/network-request-failed': '🌐 Erreur réseau, vérifiez votre connexion',
+                'auth/user-disabled': '🚫 Ce compte a été désactivé'
+            };
+            return map[code] || '❌ Erreur: ' + code;
+        }
+
+        // =============================================
+        // TOUCHE ENTREE
+        // =============================================
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (document.getElementById('loginForm').style.display !== 'none') {
+                    loginUser();
+                } else if (document.getElementById('registerForm').style.display !== 'none') {
+                    registerUser();
+                }
+            }
+        });
+
+        console.log('✅ Page d\'authentification chargée');
+        console.log('🔐 En attente de saisie utilisateur...');
+    </script>
+</body>
+</html>

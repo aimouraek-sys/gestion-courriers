@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Gestion des Utilisateurs</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyDFqRF8oX5NVh0uIeWNeh8W74F5TiLtZe4",
+            authDomain: "courriers-aim.firebaseapp.com",
+            projectId: "courriers-aim",
+            storageBucket: "courriers-aim.firebasestorage.app",
+            messagingSenderId: "763278473454",
+            appId: "1:763278473454:web:3dd6c894e75df2ef3f9bff"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        var auth = firebase.auth();
+
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'auth.html';
+            } else {
+                console.log('✅ Connecté:', user.email);
+                document.getElementById('appContent').style.display = 'block';
+                document.getElementById('currentUser').textContent = user.email;
+                chargerUtilisateurs();
+            }
+        });
+
+        function logoutUser() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                auth.signOut().then(function() {
+                    window.location.href = 'auth.html';
+                });
+            }
+        }
+    </script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+            text-align: right;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: none;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header h1 {
+            color: #1e3c72;
+            font-size: 24px;
+        }
+        .header .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        .header .user-info {
+            font-size: 14px;
+            color: #555;
+            font-weight: 500;
+        }
+        .header .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .header .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-back {
+            background: #1e3c72;
+            color: white;
+        }
+        .btn-back:hover {
+            background: #2a5298;
+            transform: translateY(-2px);
+        }
+        .btn-logout {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-logout:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+        .btn-refresh {
+            background: #10b981;
+            color: white;
+        }
+        .btn-refresh:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        .btn-edit {
+            background: #f59e0b;
+            color: white;
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+        .btn-edit:hover {
+            background: #d97706;
+        }
+        .btn-toggle {
+            background: #8b5cf6;
+            color: white;
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+        .btn-toggle:hover {
+            background: #7c3aed;
+        }
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .stat-card .label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+        }
+        .stat-card.blue .number { color: #1e3c72; }
+        .stat-card.green .number { color: #10b981; }
+        .stat-card.red .number { color: #dc2626; }
+        .stat-card.purple .number { color: #8b5cf6; }
+        .stat-card.orange .number { color: #f59e0b; }
+        
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+        }
+        .filters input, .filters select {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 150px;
+            background: white;
+        }
+        .filters input:focus, .filters select:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+        .filters .btn-search {
+            padding: 8px 20px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .filters .btn-search:hover {
+            background: #2a5298;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        table th {
+            background: #1e3c72;
+            color: white;
+            padding: 12px 15px;
+            text-align: right;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+        }
+        table tr:hover {
+            background: #f8fafc;
+        }
+        table tr.blocked-row td {
+            background: #fef2f2;
+            opacity: 0.7;
+        }
+        table tr.blocked-row td .status-badge {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.active { background: #d1fae5; color: #065f46; }
+        .status-badge.blocked { background: #fee2e2; color: #dc2626; }
+        .status-badge.admin { background: #fef3c7; color: #92400e; }
+        .status-badge.user { background: #dbeafe; color: #1e40af; }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .role-badge.admin { background: #fef3c7; color: #92400e; }
+        .role-badge.user { background: #dbeafe; color: #1e40af; }
+        
+        .actions-cell {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .actions-cell .btn {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .actions-cell .btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .no-data .emoji {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            color: #1e3c72;
+            margin: 0;
+        }
+        .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+        }
+        .modal-header .close-btn:hover {
+            color: #dc2626;
+        }
+        .modal-content .form-group {
+            margin-bottom: 15px;
+        }
+        .modal-content .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .modal-content .form-group input, 
+        .modal-content .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .modal-content .form-group input:focus,
+        .modal-content .form-group select:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+        .modal-content .btn-save {
+            padding: 12px 24px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+        }
+        .modal-content .btn-save:hover {
+            background: #2a5298;
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .header { flex-direction: column; text-align: center; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            table { font-size: 12px; }
+            table th, table td { padding: 8px 10px; }
+            .filters { flex-direction: column; }
+            .filters input, .filters select { min-width: 100%; }
+            .actions-cell { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="appContent">
+        <!-- HEADER -->
+        <div class="header">
+            <div>
+                <h1>📊 Gestion des Utilisateurs</h1>
+                <div class="subtitle">👤 Connecté : <span id="currentUser">Chargement...</span></div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-refresh" onclick="chargerUtilisateurs()">🔄 Actualiser</button>
+                <a href="app-courriers.html" class="btn btn-back">📋 Retour</a>
+                <button class="btn btn-logout" onclick="logoutUser()">🚪 Déconnexion</button>
+            </div>
+        </div>
+
+        <!-- STATISTIQUES -->
+        <div class="stats-grid" id="statsGrid">
+            <!-- Chargé dynamiquement -->
+        </div>
+
+        <!-- FILTRES -->
+        <div class="filters">
+            <input type="text" id="filterEmail" placeholder="🔍 Email" onkeyup="filtrerUtilisateurs()">
+            <input type="text" id="filterName" placeholder="🔍 Nom" onkeyup="filtrerUtilisateurs()">
+            <input type="text" id="filterService" placeholder="🔍 Service" onkeyup="filtrerUtilisateurs()">
+            <input type="text" id="filterDirection" placeholder="🔍 Direction" onkeyup="filtrerUtilisateurs()">
+            <select id="filterRole" onchange="filtrerUtilisateurs()">
+                <option value="">📌 Tous les rôles</option>
+                <option value="admin">⭐ Admin</option>
+                <option value="user">👤 Utilisateur</option>
+            </select>
+            <select id="filterStatus" onchange="filtrerUtilisateurs()">
+                <option value="">📌 Tous les statuts</option>
+                <option value="active">✅ Actif</option>
+                <option value="blocked">🚫 Bloqué</option>
+            </select>
+            <button class="btn-search" onclick="filtrerUtilisateurs()">🔎 Rechercher</button>
+            <button class="btn-search" onclick="resetFiltres()" style="background:#6b7280;">🔄 Réinitialiser</button>
+        </div>
+
+        <!-- TABLEAU DES UTILISATEURS -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>👤 Email</th>
+                        <th>📝 Nom</th>
+                        <th>🏢 Bureau</th>
+                        <th>📋 Service</th>
+                        <th>🏛️ Direction</th>
+                        <th>⭐ Rôle</th>
+                        <th>📌 Statut</th>
+                        <th>⚙️ Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- Chargé dynamiquement -->
+                </tbody>
+            </table>
+        </div>
+        <div id="resultsCount" style="margin-top:10px; color:#666; font-size:14px;"></div>
+    </div>
+
+    <!-- ====== MODALE D'ÉDITION ====== -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Modifier l'utilisateur</h2>
+                <button class="close-btn" onclick="fermerEditModal()">&times;</button>
+            </div>
+            <form id="editUserForm" onsubmit="sauvegarderUtilisateur(event)">
+                <input type="hidden" id="editEmail">
+                <div class="form-group">
+                    <label>👤 Nom complet</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-group">
+                    <label>🏢 Bureau</label>
+                    <input type="text" id="editBureau">
+                </div>
+                <div class="form-group">
+                    <label>📋 Service</label>
+                    <input type="text" id="editService">
+                </div>
+                <div class="form-group">
+                    <label>🏛️ Direction</label>
+                    <input type="text" id="editDirection">
+                </div>
+                <div class="form-group">
+                    <label>⭐ Rôle</label>
+                    <select id="editRole">
+                        <option value="user">👤 Utilisateur</option>
+                        <option value="admin">⭐ Administrateur</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📌 Statut</label>
+                    <select id="editStatus">
+                        <option value="false">✅ Actif</option>
+                        <option value="true">🚫 Bloqué</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-save">💾 Sauvegarder</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  📊 GESTION DES UTILISATEURS
+        // ================================================================
+
+        var utilisateursData = [];
+        var utilisateursFiltres = [];
+
+        function getUsers() {
+            var data = localStorage.getItem('app_users');
+            if (data) {
+                try {
+                    var users = JSON.parse(data);
+                    var converted = {};
+                    for (var key in users) {
+                        converted[key] = {
+                            password: users[key].password || users[key].pwd || 'password',
+                            role: users[key].role || 'user',
+                            name: users[key].name || users[key].service || key,
+                            bureau: users[key].bureau || '',
+                            service: users[key].service || '',
+                            direction: users[key].direction || '',
+                            blocked: users[key].blocked || false
+                        };
+                    }
+                    return converted;
+                } catch (e) { console.error('Erreur chargement utilisateurs', e); }
+            }
+            var defaultUsers = {
+                'admin': {
+                    password: 'admin123',
+                    role: 'admin',
+                    name: 'Administrateur',
+                    bureau: 'Bureau 1',
+                    service: 'Administration',
+                    direction: 'Direction Générale',
+                    blocked: false
+                }
+            };
+            localStorage.setItem('app_users', JSON.stringify(defaultUsers));
+            return defaultUsers;
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('app_users', JSON.stringify(users));
+        }
+
+        function chargerUtilisateurs() {
+            var users = getUsers();
+            utilisateursData = [];
+            
+            var total = 0;
+            var admins = 0;
+            var blocked = 0;
+            var actifs = 0;
+            var services = {};
+            var directions = {};
+            
+            for (var key in users) {
+                var user = users[key];
+                utilisateursData.push({
+                    email: key,
+                    name: user.name || key,
+                    bureau: user.bureau || '',
+                    service: user.service || '',
+                    direction: user.direction || '',
+                    role: user.role || 'user',
+                    blocked: user.blocked || false,
+                    password: user.password || 'password'
+                });
+                
+                total++;
+                if (user.role === 'admin') admins++;
+                if (user.blocked) blocked++;
+                else actifs++;
+                
+                var service = user.service || 'Non défini';
+                var direction = user.direction || 'Non défini';
+                services[service] = (services[service] || 0) + 1;
+                directions[direction] = (directions[direction] || 0) + 1;
+            }
+            
+            // Statistiques
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card blue">
+                    <div class="number">${total}</div>
+                    <div class="label">👥 Total</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="number">${actifs}</div>
+                    <div class="label">✅ Actifs</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="number">${blocked}</div>
+                    <div class="label">🚫 Bloqués</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="number">${admins}</div>
+                    <div class="label">⭐ Admins</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="number">${Object.keys(services).length}</div>
+                    <div class="label">📋 Services</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="number">${Object.keys(directions).length}</div>
+                    <div class="label">🏛️ Directions</div>
+                </div>
+            `;
+            
+            utilisateursFiltres = utilisateursData.slice();
+            afficherUtilisateurs(utilisateursFiltres);
+        }
+
+        function afficherUtilisateurs(list) {
+            var tbody = document.getElementById('usersTableBody');
+            var count = document.getElementById('resultsCount');
+            
+            count.textContent = list.length + ' utilisateur(s) trouvé(s)';
+            
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="9">
+                        <div class="no-data">
+                            <span class="emoji">🔍</span>
+                            Aucun utilisateur trouvé
+                        </div>
+                    </td></tr>
+                `;
+                return;
+            }
+            
+            var html = '';
+            for (var i = 0; i < list.length; i++) {
+                var u = list[i];
+                var rowClass = u.blocked ? 'blocked-row' : '';
+                var statusClass = u.blocked ? 'blocked' : 'active';
+                var statusLabel = u.blocked ? '🚫 Bloqué' : '✅ Actif';
+                var roleClass = u.role === 'admin' ? 'admin' : 'user';
+                var roleLabel = u.role === 'admin' ? '⭐ Admin' : '👤 Utilisateur';
+                
+                // Vérifier si c'est l'utilisateur actuel (pour ne pas se bloquer soi-même)
+                var isCurrentUser = u.email === firebaseUser.email;
+                var disableActions = isCurrentUser ? 'disabled' : '';
+                
+                html += `
+                    <tr class="${rowClass}">
+                        <td>${i + 1}</td>
+                        <td><strong>${escapeHtml(u.email)}</strong></td>
+                        <td>${escapeHtml(u.name)}</td>
+                        <td>${escapeHtml(u.bureau) || '-'}</td>
+                        <td>${escapeHtml(u.service) || '-'}</td>
+                        <td>${escapeHtml(u.direction) || '-'}</td>
+                        <td><span class="role-badge ${roleClass}">${roleLabel}</span></td>
+                        <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="btn btn-edit" onclick="ouvrirEditModal('${escapeHtml(u.email)}')" ${disableActions}>
+                                    ✏️
+                                </button>
+                                <button class="btn btn-toggle" onclick="toggleBloquer('${escapeHtml(u.email)}')" ${disableActions}>
+                                    ${u.blocked ? '🔓' : '🔒'}
+                                </button>
+                                <button class="btn btn-delete" onclick="supprimerUtilisateur('${escapeHtml(u.email)}')" ${disableActions}>
+                                    🗑️
+                                </button>
+                            </div>
+                            ${isCurrentUser ? '<span style="font-size:10px; color:#999;">(vous)</span>' : ''}
+                        </td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+        }
+
+        // ================================================================
+        //  FILTRES
+        // ================================================================
+
+        function filtrerUtilisateurs() {
+            var filterEmail = document.getElementById('filterEmail').value.toLowerCase();
+            var filterName = document.getElementById('filterName').value.toLowerCase();
+            var filterService = document.getElementById('filterService').value.toLowerCase();
+            var filterDirection = document.getElementById('filterDirection').value.toLowerCase();
+            var filterRole = document.getElementById('filterRole').value;
+            var filterStatus = document.getElementById('filterStatus').value;
+            
+            var results = utilisateursData.filter(function(u) {
+                if (filterEmail && !u.email.toLowerCase().includes(filterEmail)) return false;
+                if (filterName && !u.name.toLowerCase().includes(filterName)) return false;
+                if (filterService && !u.service.toLowerCase().includes(filterService)) return false;
+                if (filterDirection && !u.direction.toLowerCase().includes(filterDirection)) return false;
+                if (filterRole && u.role !== filterRole) return false;
+                if (filterStatus === 'active' && u.blocked) return false;
+                if (filterStatus === 'blocked' && !u.blocked) return false;
+                return true;
+            });
+            
+            utilisateursFiltres = results;
+            afficherUtilisateurs(results);
+        }
+
+        function resetFiltres() {
+            document.getElementById('filterEmail').value = '';
+            document.getElementById('filterName').value = '';
+            document.getElementById('filterService').value = '';
+            document.getElementById('filterDirection').value = '';
+            document.getElementById('filterRole').value = '';
+            document.getElementById('filterStatus').value = '';
+            utilisateursFiltres = utilisateursData.slice();
+            afficherUtilisateurs(utilisateursFiltres);
+        }
+
+        // ================================================================
+        //  MODALE D'ÉDITION
+        // ================================================================
+
+        function ouvrirEditModal(email) {
+            var users = getUsers();
+            var user = users[email];
+            if (!user) return;
+            
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editName').value = user.name || '';
+            document.getElementById('editBureau').value = user.bureau || '';
+            document.getElementById('editService').value = user.service || '';
+            document.getElementById('editDirection').value = user.direction || '';
+            document.getElementById('editRole').value = user.role || 'user';
+            document.getElementById('editStatus').value = user.blocked ? 'true' : 'false';
+            
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function fermerEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        function sauvegarderUtilisateur(e) {
+            e.preventDefault();
+            
+            var email = document.getElementById('editEmail').value;
+            var name = document.getElementById('editName').value.trim();
+            var bureau = document.getElementById('editBureau').value.trim();
+            var service = document.getElementById('editService').value.trim();
+            var direction = document.getElementById('editDirection').value.trim();
+            var role = document.getElementById('editRole').value;
+            var blocked = document.getElementById('editStatus').value === 'true';
+            
+            if (!name) {
+                alert('⚠️ Le nom est obligatoire');
+                return;
+            }
+            
+            var users = getUsers();
+            if (!users[email]) {
+                alert('❌ Utilisateur non trouvé');
+                return;
+            }
+            
+            users[email] = {
+                password: users[email].password || 'password',
+                role: role,
+                name: name,
+                bureau: bureau,
+                service: service,
+                direction: direction,
+                blocked: blocked
+            };
+            
+            saveUsers(users);
+            fermerEditModal();
+            chargerUtilisateurs();
+            alert('✅ Utilisateur mis à jour avec succès !');
+        }
+
+        // ================================================================
+        //  ACTIONS
+        // ================================================================
+
+        function toggleBloquer(email) {
+            if (email === firebaseUser.email) {
+                alert('⚠️ Vous ne pouvez pas vous bloquer vous-même !');
+                return;
+            }
+            
+            var users = getUsers();
+            if (!users[email]) return;
+            
+            var newStatus = !users[email].blocked;
+            var action = newStatus ? 'bloquer' : 'débloquer';
+            
+            if (!confirm('Êtes-vous sûr de vouloir ' + action + ' l\'utilisateur ' + email + ' ?')) return;
+            
+            users[email].blocked = newStatus;
+            saveUsers(users);
+            chargerUtilisateurs();
+            alert('✅ Utilisateur ' + (newStatus ? 'bloqué' : 'débloqué') + ' avec succès !');
+        }
+
+        function supprimerUtilisateur(email) {
+            if (email === firebaseUser.email) {
+                alert('⚠️ Vous ne pouvez pas vous supprimer vous-même !');
+                return;
+            }
+            
+            if (!confirm('⚠️ Êtes-vous sûr de vouloir supprimer définitivement l\'utilisateur ' + email + ' ?\nCette action est irréversible !')) return;
+            
+            var users = getUsers();
+            if (!users[email]) return;
+            
+            delete users[email];
+            saveUsers(users);
+            chargerUtilisateurs();
+            alert('✅ Utilisateur supprimé avec succès !');
+        }
+
+        // ================================================================
+        //  UTILITAIRES
+        // ================================================================
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Fermer la modale en cliquant à l'extérieur
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) fermerEditModal();
+        });
+    </script>
+</body>
+</html>
